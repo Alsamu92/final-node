@@ -32,6 +32,14 @@ app.use(express.urlencoded({ limit: "5mb", extended: false }));
 //?-----------------------Crear las rutas---------------------------------
 const UserRoutes = require("./src/api/Routes/User.Routes")
 app.use("/api/v1/usuario/",UserRoutes)
+
+
+const SuperRoutes = require("./src/api/Routes/Supermercado.routes")
+const ArticuloRoutes = require("./src/api/Routes/Articulo.routes")
+app.use("/api/v1/articulos/", ArticuloRoutes);
+
+app.use("/api/v1/supermercados/",SuperRoutes)
+
 //?--------------------------------------------------------------------------
 //?-----------------------Poner servidor a funcionar---------------------------------
 
