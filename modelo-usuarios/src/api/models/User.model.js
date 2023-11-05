@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema(
       validate: [validator.isEmail, 'Email not valid'],
     },
     name: { type: String, required: true, trim: true, unique: true },
+    provincia: { type: String, required: false, trim: true, unique: false},
     password: {
       type: String,
       required: true,

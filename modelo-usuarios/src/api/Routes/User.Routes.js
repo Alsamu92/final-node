@@ -9,13 +9,14 @@ const UserRoutes=require("express").Router()
 
 UserRoutes.post("/",upload.single("image"),subirUser)
 UserRoutes.post("/register/estado/",upload.single("image"),registerEstado)
-UserRoutes.delete("/:id",borrarUser)
-UserRoutes.patch('/update/update', [isAuth], upload.single('image'), update);
+
 UserRoutes.post("/login", login)
 UserRoutes.post("/redirect/",upload.single("image"),registerRedirect)
 UserRoutes.post("/check",checkUser)
 UserRoutes.patch("/cambiarpass/cambiarpass/",cambiarContrasena)
 UserRoutes.patch("/cambiarlogeado/",[isAuth], cambiarPass)
+UserRoutes.patch('/update/update', [isAuth], upload.single('image'), update);
+UserRoutes.delete("/",[isAuth], borrarUser)
 
 
 //rutas con redirect

@@ -234,7 +234,7 @@ const sendCode = async (req, res, next) => {
       from: emailEnv,
       to: userDB.email,
       subject: "Confirmation code",
-      text: `tu codigo es ${userDB.confirmationCode}, gracias por confiar en nosotros ${userDB.name}`,
+      text: `Tu código es ${userDB.confirmationCode}, gracias por confiar en nosotros ${userDB.name}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -548,7 +548,7 @@ const update = async (req, res, next) => {
 
       updateKeys.forEach((item) => {
         //la info tiene que ser igual en la db que lo que pidio que se cambiara
-        if (updateUser[item] === req.body[item]) {ç
+        if (updateUser[item] === req.body[item]) {
           //y tiene que ser de contenido diferente. no puedes cambiar genero de hombre a hombre
           if (updateUser[item] != req.user[item]) {
             testUpdate.push({
