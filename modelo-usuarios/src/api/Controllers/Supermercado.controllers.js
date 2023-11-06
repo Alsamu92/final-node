@@ -1,5 +1,6 @@
 const Articulo = require("../models/Articulo.model");
 const Supermercado = require("../models/Supermercado.model");
+const User = require("../models/User.model");
 
 //todo CONTROLADOR POST
 
@@ -133,6 +134,24 @@ const BuscarSuper = async (req, res, next) => {
   }
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
+//todo CONTROLADOR BUSCAR Todos
+
+const getAll = async (rq, res, next) => {
+  try {
+    const TodosLosSupers = await Supermercado.find();
+    if (TodosLosSupers.length > 0) {
+      return res.status(200).json(TodosLosSupers);
+    } else {
+      return res.status(404).json("No se han encontrado artículos");
+    }
+  } catch (error) {
+    return res.status(404).json({
+      error: "error al buscar",
+      message: error.message,
+    });
+  }
+};
+//todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 //todo CONTROLADOR BUSCAR POR NOMBRE
 const buscarNameSuper = async (req, res, nex) => {
@@ -223,13 +242,30 @@ const update = async (req, res, next) => {
 //todo CONTROLADOR BUSCAR POR Lugar
 const buscarPorLugarSuper = async (req, res, nex) => {
   try {
-    const { lugar } = req.params;
-    const lugarSuper = await Supermercado.find({ name });
-    if (lugarSuper.length > 0) {
-      return res.status(200).json(lugarSuper);
-    } else {
-      return res.status(404).json("No se ha encontado este super");
-    }
+    const {usid} = req.params;
+    const todosSupers = await Supermercado.find();
+    console.log(usid)
+   
+  const usuarioBuscado= await User.findById(usid)
+
+    const supersCoincidentes= []
+  
+      todosSupers.forEach((supermercado)=>{
+  
+if(supermercado.provincias.includes(usuarioBuscado.provincia)){
+
+ supersCoincidentes.push(supermercado)
+}
+
+     })
+      if (supersCoincidentes.length > 0) {
+        return res.status(200).json( supersCoincidentes);
+      } else {
+        return res.status(404).json("No se ha encontrado supermercados en esta provincia");
+      }
+     
+     
+   
   } catch (error) {
     return res.status(404).json({
       error: "No encontrado",
@@ -246,4 +282,6 @@ module.exports = {
   BuscarSuper,
   buscarNameSuper,
   update,
+  buscarPorLugarSuper,
+  getAll
 };
