@@ -9,6 +9,8 @@ const Schema = mongoose.Schema;
 const ArticuloSchema = new Schema(
   {
     name: { type: String, required: false, unique: false },
+    descripcion: { type: String, required: false, unique: false },
+    categoria:{enum:["limpieza","alimentación","juguetes","textil","electrónica","droguería"], type:String, required:true},
     price: {
       type:String,
       required: true,
@@ -18,6 +20,7 @@ const ArticuloSchema = new Schema(
       required: false,
     },
     supermercados: [{ type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,

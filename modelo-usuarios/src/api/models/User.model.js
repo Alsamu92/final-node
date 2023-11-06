@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    ArticuloFav: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Articulo' }],
+    SupermercadoFav: [{ type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    followed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   {
     timestamps: true,
