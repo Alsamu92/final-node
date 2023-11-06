@@ -216,6 +216,35 @@ const update = async (req, res, next) => {
 
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 
+//todo CONTROLADOR Ordenar de mayor a menor número de likes
+
+const ordenarLikes = async (req, res, next) => {
+  try {
+    const TodosLosArticulos = await Articulo.find();
+    if (TodosLosArticulos.length > 0) {
+    const resultados = TodosLosArticulos.map((articulo) => ({
+      name: articulo.name,
+      likesCount: articulo.likes.length,
+    }));
+
+    resultados.sort((a, b) => b.likesCount - a.likesCount);
+
+   
+      const primerElemento = resultados[0];
+      return res.status(200).json(primerElemento);
+    } else {
+      return res.status(404).json({
+        error: "No se encontraron artículos",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "Error al buscar",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   create,
   getByID,
@@ -223,5 +252,5 @@ module.exports = {
   getByName,
   deleteArticulo,
   update,
-  getByCategoria
+  getByCategoria,ordenarLikes
 };

@@ -1,4 +1,4 @@
-//todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
+
 const bcrypt = require("bcrypt");
 
 const setError = require("../../../helpers/handle-error");
@@ -14,6 +14,9 @@ const enumOk = require("../../utils/enumOk");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const Supermercado = require("../models/Supermercado.model");
 const Articulo = require("../models/Articulo.model");
+
+
+//todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
 const subirUser = async (req, res, next) => {
   let catchImg = req.file?.path;
 
@@ -759,7 +762,62 @@ const hacerArticuloFav=async(req,res,next)=>{
   }
   }
 
+//todo---------------------------------------------------------------------
+//todo-----------------------------------------------------------------------------------------------------------------------------------------
 
+//todo CONTROLADOR BUSCAR POR ID
+
+const BuscarUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userPorId = await User.findById(id);
+    if (userPorId) {
+      return res.status(200).json(userPorId);
+    } else {
+      return res.status(404).json("No se ha encontrado");
+    }
+  } catch (error) {
+    return res.status(404).json("No encontrado");
+  }
+};
+//todo-----------------------------------------------------------------------------------------------------------------------------------------
+//todo CONTROLADOR BUSCAR Todos
+
+const getAll = async (rq, res, next) => {
+  try {
+    const todosLosUsers = await User.find();
+    if (todosLosUsers.length > 0) {
+      return res.status(200).json(todosLosUsers);
+    } else {
+      return res.status(404).json("No se han encontrado usuarios");
+    }
+  } catch (error) {
+    return res.status(404).json({
+      error: "error al buscar",
+      message: error.message,
+    });
+  }
+};
+//todo-----------------------------------------------------------------------------------------------------------------------------------------
+
+//todo CONTROLADOR BUSCAR POR NOMBRE
+const buscarNameUser = async (req, res, nex) => {
+  try {
+    const { name } = req.params;
+    const nombreUser = await User.find({ name });
+    if (nombreUser.length > 0) {
+      return res.status(200).json(nombreUser);
+    } else {
+      return res.status(404).json("No se ha encontado este usuario");
+    }
+  } catch (error) {
+    return res.status(404).json({
+      error: "No encontrado",
+      message: error.message,
+    });
+  }
+};
+//todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -778,5 +836,8 @@ module.exports = {
   sendPassword,
   cambiarPass,
   hacerSuperFav,
-  hacerArticuloFav
+  hacerArticuloFav,
+  getAll,
+  buscarNameUser,
+  BuscarUser
 };

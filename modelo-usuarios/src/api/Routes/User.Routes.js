@@ -1,11 +1,13 @@
 
 const { isAuth } = require("../../middleware/auth.middleware");
 const { upload } = require("../../middleware/files.middleware");
-const { subirUser, borrarUser, update, registerEstado, login, sendCode, registerRedirect, checkUser, sendPassword, cambiarContrasena, cambiarPass, hacerSuperFav, hacerArticuloFav } = require("../Controllers/User.Controllers")
+const { subirUser, borrarUser, update, registerEstado, login, sendCode, registerRedirect, checkUser, sendPassword, cambiarContrasena, cambiarPass, hacerSuperFav, hacerArticuloFav, getAll, buscarNameUser, BuscarUser } = require("../Controllers/User.Controllers")
 
 const UserRoutes=require("express").Router()
 
-
+UserRoutes.get("/",getAll)
+UserRoutes.get("/byName/:name",buscarNameUser)
+UserRoutes.get("/:id",BuscarUser)
 
 UserRoutes.post("/",upload.single("image"),subirUser)
 UserRoutes.post("/register/estado/",upload.single("image"),registerEstado)
