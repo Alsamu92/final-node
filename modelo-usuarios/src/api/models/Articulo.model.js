@@ -8,9 +8,10 @@ const Schema = mongoose.Schema;
 
 const ArticuloSchema = new Schema(
   {
-    name: { type: String, required: false, unique: false },
+    name: { type: String, required: false, unique: true },
+    oferta: { type: Boolean, required: false, unique: false },
     descripcion: { type: String, required: false, unique: false },
-    categoria:{enum:["limpieza","alimentación","juguetes","textil","electrónica","droguería"], type:String, required:true},
+    categoria:{enum:["limpieza","alimentacion","juguetes","textil","electronica","drogueria"], type:String, required:true},
     price: {
       type:String,
       required: true,

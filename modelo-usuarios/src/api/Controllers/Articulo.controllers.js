@@ -1,4 +1,5 @@
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
+const { enumOkCate } = require("../../utils/enumOk");
 const Articulo = require("../models/Articulo.model");
 const Supermercado = require("../models/Supermercado.model");
 
@@ -73,6 +74,23 @@ const getByID = async (req, res, next) => {
     return res.status(404).json(error.message);
   }
 };
+//TODO--------------------------------------------------------------------------------------------------------------------------------------------
+
+//TODO CONTROLADOR PARA BUSCAR POR Categoria
+
+const getByCategoria = async (req, res, next) => {
+  try {
+    const { categoria } = req.params;
+    const articuloPorCate = await Articulo.find({categoria});
+    if (articuloPorCate) {
+      return res.status(200).json(articuloPorCate);
+    } else {
+      return res.status(404).json("No hay artículos en esta categoría");
+    }
+  } catch (error) {
+    return res.status(404).json(error.message);
+  }
+};
 
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -142,6 +160,10 @@ const update = async (req, res, next) => {
         name: req.body?.name ? req.body?.name : ArticuloById.name,
         price: req.body?.price ? req.body?.price : ArticuloById.price,
       };
+      if (req.body?.categoria) {
+        const resultEnum = enumOkCate(req.body?.categoria);
+        customBody.categoria = resultEnum.check ? req.body?.categoria : req.user.categoria;
+      }
 
       try {
         await Articulo.findByIdAndUpdate(id, customBody);
@@ -201,4 +223,5 @@ module.exports = {
   getByName,
   deleteArticulo,
   update,
+  getByCategoria
 };

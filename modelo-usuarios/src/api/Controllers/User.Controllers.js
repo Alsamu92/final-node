@@ -12,6 +12,8 @@ const nodemailer = require("nodemailer");
 const validator=require("validator");
 const enumOk = require("../../utils/enumOk");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
+const Supermercado = require("../models/Supermercado.model");
+const Articulo = require("../models/Articulo.model");
 const subirUser = async (req, res, next) => {
   let catchImg = req.file?.path;
 
@@ -598,9 +600,164 @@ const update = async (req, res, next) => {
   }
 };
 //todo---------------------------------------------------------------------
+//todo-----------CONTROLADOR PARA hacer favorito un Super-------------------
+
+const hacerSuperFav=async(req,res,next)=>{
+try {
+  const{idSuper}=req.params
+  const{_id,SupermercadoFav}=req.user
+
+  if(SupermercadoFav.includes(idSuper)){
+    try {
+      await User.findByIdAndUpdate(_id,{
+        $pull:{SupermercadoFav:idSuper}
+      })
+      try {
+        await Supermercado.findByIdAndUpdate(idSuper,{
+          $pull:{likes:_id}
+        })
+        
+        return res.status(200).json({
+          userActualizado:await User.findById(_id),
+          superActualizado:await Supermercado.findById(idSuper),
+          action:`Sacado el supermercado con id ${idSuper}`
+        })
 
 
 
+
+      } catch (error) {
+        return res.status(404).json({
+          error:"Error al actualizar pull de los supers",
+          message:error.message
+        })
+      }
+    } catch (error) {
+      return res.status(404).json({
+        error:"Error al actualizar pull",
+        message:error.message
+      })
+      
+    }
+  }else{
+    try {
+      await User.findByIdAndUpdate(_id,{
+        $push:{SupermercadoFav:idSuper}
+      })
+      try {
+        await Supermercado.findByIdAndUpdate(idSuper,{
+          $push:{likes:_id}
+        })
+        
+        return res.status(200).json({
+          userActualizado:await User.findById(_id),
+          superActualizado:await Supermercado.findById(idSuper),
+          action:`Metido el supermercado con id ${idSuper}`
+        })
+
+
+
+
+      } catch (error) {
+        return res.status(404).json({
+          error:"Error al actualizar push de los supers",
+          message:error.message
+        })
+      }
+    } catch (error) {
+      return res.status(404).json({
+        error:"Error al actualizar push",
+        message:error.message
+      })
+      
+    }
+  }
+  
+} catch (error) {
+  return next(setError(500,error.message ||"Error en el catch general"))
+  
+}
+}
+
+//todo---------------------------------------------------------------------
+//todo-----------CONTROLADOR PARA hacer favorito un articulo-------------------
+
+const hacerArticuloFav=async(req,res,next)=>{
+  try {
+    const{idArticulo}=req.params
+    const{_id,ArticuloFav}=req.user
+  
+    if(ArticuloFav.includes(idArticulo)){
+      try {
+        await User.findByIdAndUpdate(_id,{
+          $pull:{ArticuloFav:idArticulo}
+        })
+        try {
+          await Articulo.findByIdAndUpdate(idArticulo,{
+            $pull:{likes:_id}
+          })
+          
+          return res.status(200).json({
+            userActualizado:await User.findById(_id),
+            articuloActualizado:await Articulo.findById(idArticulo),
+            action:`Sacado el artículo con id ${idArticulo}`
+          })
+  
+  
+  
+  
+        } catch (error) {
+          return res.status(404).json({
+            error:"Error al actualizar pull de los artículos",
+            message:error.message
+          })
+        }
+      } catch (error) {
+        return res.status(404).json({
+          error:"Error al actualizar pull",
+          message:error.message
+        })
+        
+      }
+    }else{
+      try {
+        await User.findByIdAndUpdate(_id,{
+          $push:{ArticuloFav:idArticulo}
+        })
+        try {
+          await Articulo.findByIdAndUpdate(idArticulo,{
+            $push:{likes:_id}
+          })
+          
+          return res.status(200).json({
+            userActualizado:await User.findById(_id),
+            articuloActualizado:await Articulo.findById(idArticulo),
+            action:`Metido el artículo con id ${idArticulo}`
+          })
+  
+  
+  
+  
+        } catch (error) {
+          return res.status(404).json({
+            error:"Error al actualizar push de los artículos",
+            message:error.message
+          })
+        }
+      } catch (error) {
+        return res.status(404).json({
+          error:"Error al actualizar push",
+          message:error.message
+        })
+        
+      }
+    }
+    
+  } catch (error) {
+    return next(setError(500,error.message ||"Error en el catch general"))
+    
+  }
+  }
 
 
 
@@ -620,4 +777,6 @@ module.exports = {
   cambiarContrasena,
   sendPassword,
   cambiarPass,
+  hacerSuperFav,
+  hacerArticuloFav
 };

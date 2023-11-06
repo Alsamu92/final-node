@@ -8,5 +8,15 @@ const enumOk = (gender) => {
     };
   }
 };
+const enumOkCate = (categoria) => {
+  const enumcate = ["limpieza","alimentacion","juguetes","textil","electronica","drogueria"];
+  if (enumcate.includes(categoria)) {
+    return { check: true, categoria };
+  } else {
+    return {
+      check: false,
+    };
+  }
+};
 
-module.exports = enumOk;
+module.exports ={enumOk,enumOkCate}
