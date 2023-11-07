@@ -274,7 +274,33 @@ if(supermercado.provincias.includes(usuarioBuscado.provincia)){
   }
 };
 //todo------------------------------------------------------------------------------------------------------------------------------------
+//todo-----------------Ordenar por número de artículos-------------------------------------------------------------------------------------------------------------------
+const mostrarConMasArt = async (req, res, next) => {
+  try {
+    const TodosLosSuper = await Supermercado.find();
+    if (TodosLosSuper.length > 0) {
+    const resultados = TodosLosSuper.map((supermercado) => ({
+      name: supermercado.name,
+      artCount:supermercado.articulos.length,
+    }));
 
+    resultados.sort((a, b) => b.artCount - a.artCount);
+
+   
+      const primerElemento = resultados[0];
+      return res.status(200).json(primerElemento);
+    } else {
+      return res.status(404).json({
+        error: "No se encontraron supermercados",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "Error al buscar",
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   crearSupermercado,
   toggleArticulo,
@@ -283,5 +309,6 @@ module.exports = {
   buscarNameSuper,
   update,
   buscarPorLugarSuper,
-  getAll
+  getAll,
+  mostrarConMasArt
 };

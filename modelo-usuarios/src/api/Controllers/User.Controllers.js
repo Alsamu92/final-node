@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcrypt");
 
 const setError = require("../../../helpers/handle-error");
@@ -9,12 +8,11 @@ const sendEmail = require("../../utils/sendEmail");
 const { generateToken } = require("../../utils/token");
 const User = require("../models/User.model");
 const nodemailer = require("nodemailer");
-const validator=require("validator");
+const validator = require("validator");
 const enumOk = require("../../utils/enumOk");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const Supermercado = require("../models/Supermercado.model");
 const Articulo = require("../models/Articulo.model");
-
 
 //todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
 const subirUser = async (req, res, next) => {
@@ -189,7 +187,7 @@ const registerRedirect = async (req, res, next) => {
         if (usuarioGuardado) {
           return res.redirect(
             307,
-            `http://localhost:8080/api/v1/users/register/sendMail/${usuarioGuardado._id}`
+            `http://localhost:8080/api/v1/usuario/register/sendmail/${usuarioGuardado._id}`
           );
         }
       } catch (error) {
@@ -457,55 +455,52 @@ const sendPassword = async (req, res, next) => {
 
 //todo -----------------------Cambiar contraseña logeado-------------------
 
-const cambiarPass= async(req,res,next)=>{
+const cambiarPass = async (req, res, next) => {
   try {
-    const{password,newPassword}=req.body
-    const validarPass=validator.isStrongPassword(newPassword)
-if(validarPass){
-const{_id}=req.user
-if(bcrypt.compareSync(password,req.user.password)){
-const hasNewPass=bcrypt.hashSync(newPassword,10)
-try {
-  await User.findByIdAndUpdate(_id,{password:hasNewPass})
-  const userActualizado=await  User.findById(_id)
-  if(bcrypt.compareSync(newPassword,userActualizado.password)){
-return res.status(200).json({updateUSer:true})
-  }else{
-    return res.status(404).json({updateUSer:false})
-  }
-
-
-} catch (error) {
-  return res.status(404).json({
-    error:"Error al actualizar la contraseña",
-    message:error.message
-  })
-}
-
-}else{
-  return res.status(404).json("La contraseña no coincide")
-}
-}else{
-  return res.status(404).json("La contraseña no es segura")
-}
-
+    const { password, newPassword } = req.body;
+    const validarPass = validator.isStrongPassword(newPassword);
+    if (validarPass) {
+      const { _id } = req.user;
+      if (bcrypt.compareSync(password, req.user.password)) {
+        const hasNewPass = bcrypt.hashSync(newPassword, 10);
+        try {
+          await User.findByIdAndUpdate(_id, { password: hasNewPass });
+          const userActualizado = await User.findById(_id);
+          if (bcrypt.compareSync(newPassword, userActualizado.password)) {
+            return res.status(200).json({ updateUSer: true });
+          } else {
+            return res.status(404).json({ updateUSer: false });
+          }
+        } catch (error) {
+          return res.status(404).json({
+            error: "Error al actualizar la contraseña",
+            message: error.message,
+          });
+        }
+      } else {
+        return res.status(404).json("La contraseña no coincide");
+      }
+    } else {
+      return res.status(404).json("La contraseña no es segura");
+    }
   } catch (error) {
     return next(
-      setError(500,error.message || "Error general al cambiar contaseña")
-    )
+      setError(500, error.message || "Error general al cambiar contaseña")
+    );
   }
-}
+};
 //todo---------------------------------------------------------------------
 //todo-----------CONTROLADOR PARA BORRAR USUARIO-------------------
 
 const borrarUser = async (req, res, nex) => {
   try {
-  await User.findByIdAndDelete(req.user?._id)
-  deleteImgCloudinary(req.user?.image)
+    await User.findByIdAndDelete(req.user?._id);
+    deleteImgCloudinary(req.user?.image);
 
-  const testDelete= await User.findById(req.user?._id)
-  return res.status(testDelete?404:200).json({deleteTest:testDelete?false:true})
-
+    const testDelete = await User.findById(req.user?._id);
+    return res
+      .status(testDelete ? 404 : 200)
+      .json({ deleteTest: testDelete ? false : true });
   } catch (error) {
     return res.status(404).json({
       message: "Error al borrar",
@@ -531,24 +526,22 @@ const update = async (req, res, next) => {
     patchUser.email = req.user.email;
     patchUser.check = req.user.check;
 
-
     if (req.body?.gender) {
       const resultEnum = enumOk(req.body?.gender);
       patchUser.gender = resultEnum.check ? req.body?.gender : req.user.gender;
     }
 
     try {
-   // actualizar cambiando la req.user._id ,que es lo que hay en bd por lo nuevo.
+      // actualizar cambiando la req.user._id ,que es lo que hay en bd por lo nuevo.
       await User.findByIdAndUpdate(req.user._id, patchUser);
 
-  //si hay imagen nueva hay que borrar la vieja
+      //si hay imagen nueva hay que borrar la vieja
       if (req.file) deleteImgCloudinary(req.user.image);
 
       //todo ------ Cerrar los catch que hacen el testing-------------------
 
-   
       const updateUser = await User.findById(req.user._id);
- const updateKeys = Object.keys(req.body);
+      const updateKeys = Object.keys(req.body);
       const testUpdate = [];
 
       updateKeys.forEach((item) => {
@@ -560,12 +553,10 @@ const update = async (req, res, next) => {
               [item]: true,
             });
           } else {
-          
             testUpdate.push({
-              [item]: 'La información no puede ser igual a la anterior',
+              [item]: "La información no puede ser igual a la anterior",
             });
           }
-
         } else {
           testUpdate.push({
             [item]: false,
@@ -574,7 +565,6 @@ const update = async (req, res, next) => {
       });
 
       if (req.file) {
-    
         updateUser.image === catchImg
           ? testUpdate.push({
               image: true,
@@ -583,7 +573,7 @@ const update = async (req, res, next) => {
               image: false,
             });
       }
-    
+
       return res.status(200).json({
         updateUser,
         testUpdate,
@@ -591,176 +581,152 @@ const update = async (req, res, next) => {
     } catch (error) {
       req.file && deleteImgCloudinary(catchImg);
       return res.status(404).json({
-        error: 'error catch update',
+        error: "error catch update",
         message: error.message,
       });
     }
   } catch (error) {
     req.file && deleteImgCloudinary(catchImg);
     return next(
-      setError(500, error.message || 'Error general to UPDATE with AUTH')
+      setError(500, error.message || "Error general to UPDATE with AUTH")
     );
   }
 };
 //todo---------------------------------------------------------------------
 //todo-----------CONTROLADOR PARA hacer favorito un Super-------------------
 
-const hacerSuperFav=async(req,res,next)=>{
-try {
-  const{idSuper}=req.params
-  const{_id,SupermercadoFav}=req.user
+const hacerSuperFav = async (req, res, next) => {
+  try {
+    const { idSuper } = req.params;
+    const { _id, SupermercadoFav } = req.user;
 
-  if(SupermercadoFav.includes(idSuper)){
-    try {
-      await User.findByIdAndUpdate(_id,{
-        $pull:{SupermercadoFav:idSuper}
-      })
+    if (SupermercadoFav.includes(idSuper)) {
       try {
-        await Supermercado.findByIdAndUpdate(idSuper,{
-          $pull:{likes:_id}
-        })
-        
-        return res.status(200).json({
-          userActualizado:await User.findById(_id),
-          superActualizado:await Supermercado.findById(idSuper),
-          action:`Sacado el supermercado con id ${idSuper}`
-        })
+        await User.findByIdAndUpdate(_id, {
+          $pull: { SupermercadoFav: idSuper },
+        });
+        try {
+          await Supermercado.findByIdAndUpdate(idSuper, {
+            $pull: { likes: _id },
+          });
 
-
-
-
+          return res.status(200).json({
+            userActualizado: await User.findById(_id),
+            superActualizado: await Supermercado.findById(idSuper),
+            action: `Sacado el supermercado con id ${idSuper}`,
+          });
+        } catch (error) {
+          return res.status(404).json({
+            error: "Error al actualizar pull de los supers",
+            message: error.message,
+          });
+        }
       } catch (error) {
         return res.status(404).json({
-          error:"Error al actualizar pull de los supers",
-          message:error.message
-        })
+          error: "Error al actualizar pull",
+          message: error.message,
+        });
       }
-    } catch (error) {
-      return res.status(404).json({
-        error:"Error al actualizar pull",
-        message:error.message
-      })
-      
-    }
-  }else{
-    try {
-      await User.findByIdAndUpdate(_id,{
-        $push:{SupermercadoFav:idSuper}
-      })
+    } else {
       try {
-        await Supermercado.findByIdAndUpdate(idSuper,{
-          $push:{likes:_id}
-        })
-        
-        return res.status(200).json({
-          userActualizado:await User.findById(_id),
-          superActualizado:await Supermercado.findById(idSuper),
-          action:`Metido el supermercado con id ${idSuper}`
-        })
+        await User.findByIdAndUpdate(_id, {
+          $push: { SupermercadoFav: idSuper },
+        });
+        try {
+          await Supermercado.findByIdAndUpdate(idSuper, {
+            $push: { likes: _id },
+          });
 
-
-
-
+          return res.status(200).json({
+            userActualizado: await User.findById(_id),
+            superActualizado: await Supermercado.findById(idSuper),
+            action: `Metido el supermercado con id ${idSuper}`,
+          });
+        } catch (error) {
+          return res.status(404).json({
+            error: "Error al actualizar push de los supers",
+            message: error.message,
+          });
+        }
       } catch (error) {
         return res.status(404).json({
-          error:"Error al actualizar push de los supers",
-          message:error.message
-        })
+          error: "Error al actualizar push",
+          message: error.message,
+        });
       }
-    } catch (error) {
-      return res.status(404).json({
-        error:"Error al actualizar push",
-        message:error.message
-      })
-      
     }
+  } catch (error) {
+    return next(setError(500, error.message || "Error en el catch general"));
   }
-  
-} catch (error) {
-  return next(setError(500,error.message ||"Error en el catch general"))
-  
-}
-}
+};
 
 //todo---------------------------------------------------------------------
 //todo-----------CONTROLADOR PARA hacer favorito un articulo-------------------
 
-const hacerArticuloFav=async(req,res,next)=>{
+const hacerArticuloFav = async (req, res, next) => {
   try {
-    const{idArticulo}=req.params
-    const{_id,ArticuloFav}=req.user
-  
-    if(ArticuloFav.includes(idArticulo)){
+    const { idArticulo } = req.params;
+    const { _id, ArticuloFav } = req.user;
+
+    if (ArticuloFav.includes(idArticulo)) {
       try {
-        await User.findByIdAndUpdate(_id,{
-          $pull:{ArticuloFav:idArticulo}
-        })
+        await User.findByIdAndUpdate(_id, {
+          $pull: { ArticuloFav: idArticulo },
+        });
         try {
-          await Articulo.findByIdAndUpdate(idArticulo,{
-            $pull:{likes:_id}
-          })
-          
+          await Articulo.findByIdAndUpdate(idArticulo, {
+            $pull: { likes: _id },
+          });
+
           return res.status(200).json({
-            userActualizado:await User.findById(_id),
-            articuloActualizado:await Articulo.findById(idArticulo),
-            action:`Sacado el artículo con id ${idArticulo}`
-          })
-  
-  
-  
-  
+            userActualizado: await User.findById(_id),
+            articuloActualizado: await Articulo.findById(idArticulo),
+            action: `Sacado el artículo con id ${idArticulo}`,
+          });
         } catch (error) {
           return res.status(404).json({
-            error:"Error al actualizar pull de los artículos",
-            message:error.message
-          })
+            error: "Error al actualizar pull de los artículos",
+            message: error.message,
+          });
         }
       } catch (error) {
         return res.status(404).json({
-          error:"Error al actualizar pull",
-          message:error.message
-        })
-        
+          error: "Error al actualizar pull",
+          message: error.message,
+        });
       }
-    }else{
+    } else {
       try {
-        await User.findByIdAndUpdate(_id,{
-          $push:{ArticuloFav:idArticulo}
-        })
+        await User.findByIdAndUpdate(_id, {
+          $push: { ArticuloFav: idArticulo },
+        });
         try {
-          await Articulo.findByIdAndUpdate(idArticulo,{
-            $push:{likes:_id}
-          })
-          
+          await Articulo.findByIdAndUpdate(idArticulo, {
+            $push: { likes: _id },
+          });
+
           return res.status(200).json({
-            userActualizado:await User.findById(_id),
-            articuloActualizado:await Articulo.findById(idArticulo),
-            action:`Metido el artículo con id ${idArticulo}`
-          })
-  
-  
-  
-  
+            userActualizado: await User.findById(_id),
+            articuloActualizado: await Articulo.findById(idArticulo),
+            action: `Metido el artículo con id ${idArticulo}`,
+          });
         } catch (error) {
           return res.status(404).json({
-            error:"Error al actualizar push de los artículos",
-            message:error.message
-          })
+            error: "Error al actualizar push de los artículos",
+            message: error.message,
+          });
         }
       } catch (error) {
         return res.status(404).json({
-          error:"Error al actualizar push",
-          message:error.message
-        })
-        
+          error: "Error al actualizar push",
+          message: error.message,
+        });
       }
     }
-    
   } catch (error) {
-    return next(setError(500,error.message ||"Error en el catch general"))
-    
+    return next(setError(500, error.message || "Error en el catch general"));
   }
-  }
+};
 
 //todo---------------------------------------------------------------------
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
@@ -817,11 +783,75 @@ const buscarNameUser = async (req, res, nex) => {
     });
   }
 };
-//todo-----------------------------------------------------------------------------------------------------------------------------------------
+//todo---------------------------------------------------------------------
+//todo-----------CONTROLADOR PARA SEGUIR A UN USER-------------------
 
+const seguirUser = async (req, res, next) => {
+  try {
+    const { userSeguido } = req.params;
+    const { _id, following } = req.user;
 
+    if (following.includes(userSeguido)) {
+      try {
+        await User.findByIdAndUpdate(_id, {
+          $pull: { following: userSeguido },
+        });
 
+        try {
+          await User.findByIdAndUpdate(userSeguido, {
+            $pull: { followed: _id },
+          });
 
+          return res.status(200).json({
+            userUpdate: await User.findById(_id),
+            movieUpdate: await User.findById(userSeguido),
+            action: `pull user ${userSeguido}`,
+          });
+        } catch (error) {
+          return res.status(404).json({
+            error: "error catch update pull",
+            message: error.message,
+          });
+        }
+      } catch (error) {
+        return res.status(404).json({
+          error: "error catch update User pull",
+          message: error.message,
+        });
+      }
+    } else {
+      try {
+        await User.findByIdAndUpdate(_id, {
+          $push: { following: userSeguido },
+        });
+
+        try {
+          await User.findByIdAndUpdate(userSeguido, {
+            $push: { followed: _id },
+          });
+
+          return res.status(200).json({
+            userUpdate: await User.findById(_id),
+            movieUpdate: await User.findById(userSeguido),
+            action: `push user ${userSeguido}`,
+          });
+        } catch (error) {
+          return res.status(404).json({
+            error: "error catch update push",
+            message: error.message,
+          });
+        }
+      } catch (error) {
+        return res.status(404).json({
+          error: "error catch update User pull",
+          message: error.message,
+        });
+      }
+    }
+  } catch (error) {
+    return next(setError(500, error.message || "Error general to DELETE"));
+  }
+};
 
 module.exports = {
   subirUser,
@@ -839,5 +869,6 @@ module.exports = {
   hacerArticuloFav,
   getAll,
   buscarNameUser,
-  BuscarUser
+  BuscarUser,
+  seguirUser,
 };

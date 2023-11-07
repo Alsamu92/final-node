@@ -244,6 +244,10 @@ const ordenarLikes = async (req, res, next) => {
     });
   }
 };
+//todo-------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 module.exports = {
   create,
@@ -252,5 +256,6 @@ module.exports = {
   getByName,
   deleteArticulo,
   update,
-  getByCategoria,ordenarLikes
+  getByCategoria,ordenarLikes,
+  
 };

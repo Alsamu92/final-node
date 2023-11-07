@@ -42,8 +42,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     ArticuloFav: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Articulo' }],
+   
     SupermercadoFav: [{ type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" }],
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     followed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   {

@@ -1,5 +1,7 @@
+const { isAuth } = require("../../middleware/auth.middleware");
 const { upload } = require("../../middleware/files.middleware");
-const { create,getByID,getAll,getByName,deleteArticulo,update, getByCategoria, ordenarLikes } = require("../controllers/Articulo.controllers");
+const {create,getByID,getAll,getByName,deleteArticulo,update, getByCategoria, ordenarLikes  } = require("../Controllers/Articulo.controllers");
+
 
 const ArticuloRoutes = require("express").Router();
 
@@ -11,5 +13,6 @@ ArticuloRoutes.get("/byName/:name", getByName);
 ArticuloRoutes.get("/byCate/:categoria", getByCategoria);
 ArticuloRoutes.delete("/:id", deleteArticulo);
 ArticuloRoutes.patch("/:id",upload.single("image"), update);
+
 
 module.exports = ArticuloRoutes;

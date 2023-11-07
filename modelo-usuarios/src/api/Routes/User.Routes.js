@@ -1,7 +1,7 @@
 
 const { isAuth } = require("../../middleware/auth.middleware");
 const { upload } = require("../../middleware/files.middleware");
-const { subirUser, borrarUser, update, registerEstado, login, sendCode, registerRedirect, checkUser, sendPassword, cambiarContrasena, cambiarPass, hacerSuperFav, hacerArticuloFav, getAll, buscarNameUser, BuscarUser } = require("../Controllers/User.Controllers")
+const { subirUser, borrarUser, update, registerEstado, login, sendCode, registerRedirect, checkUser, sendPassword, cambiarContrasena, cambiarPass, hacerSuperFav, hacerArticuloFav, getAll, buscarNameUser, BuscarUser, seguirUser } = require("../Controllers/User.Controllers")
 
 const UserRoutes=require("express").Router()
 
@@ -21,10 +21,11 @@ UserRoutes.patch('/update/update', [isAuth], upload.single('image'), update);
 UserRoutes.delete("/",[isAuth], borrarUser)
 UserRoutes.patch("/hacersuperfav/:idSuper",[isAuth], hacerSuperFav)
 UserRoutes.patch("/hacerfavarticulo/:idArticulo",[isAuth], hacerArticuloFav)
+UserRoutes.patch("/seguiruser/:userSeguido",[isAuth], seguirUser)
 
 
 //rutas con redirect
-UserRoutes.post("/register/sendMail/:id",sendCode)
+UserRoutes.post("/register/sendmail/:id",sendCode)
 UserRoutes.patch("/sendPassword/:id",sendPassword)
 module.exports=UserRoutes
 
