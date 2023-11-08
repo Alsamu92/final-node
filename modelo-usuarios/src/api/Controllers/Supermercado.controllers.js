@@ -5,21 +5,27 @@ const User = require("../models/User.model");
 //todo CONTROLADOR POST
 
 const crearSupermercado = async (req, res, next) => {
-  try {
-    await Supermercado.syncIndexes();
-    const nuevoSupermercado = new Supermercado(req.body);
-    const guardarSuper = await nuevoSupermercado.save();
-    return res
-      .status(guardarSuper ? 200 : 400)
-      .json(guardarSuper ? guardarSuper : "Error al crear el Supermercado");
-  } catch (error) {
-    return (
-      res.status(404).json({
-        error: "error en el catch",
-        message: error.message,
-      }) && next(error)
-    );
+  const admin=req.user?._id
+  if(admin){
+    try {
+      await Supermercado.syncIndexes();
+      const nuevoSupermercado = new Supermercado(req.body);
+      const guardarSuper = await nuevoSupermercado.save();
+      return res
+        .status(guardarSuper ? 200 : 400)
+        .json(guardarSuper ? guardarSuper : "Error al crear el Supermercado");
+    } catch (error) {
+      return (
+        res.status(404).json({
+          error: "error en el catch",
+          message: error.message,
+        }) && next(error)
+      );
+    }
+  }else{
+    return res.status(404).json("no Admin")
   }
+ 
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 //todo CONTROLADOR PATCH RELACIONAL

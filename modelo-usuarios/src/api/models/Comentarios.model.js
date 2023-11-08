@@ -4,6 +4,11 @@ const ComentarioSchema = new mongoose.Schema(
   {
     publicadoPor: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     contenido: [{ type: String }],
+    valoracion: [{
+        type: String,
+        enum: ["1","2","3","4","5"],
+        required: true,
+      }],
     articuloRef: { type: mongoose.Schema.Types.ObjectId, ref: "Articulo" },
     supermercado: { type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

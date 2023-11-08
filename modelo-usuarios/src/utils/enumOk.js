@@ -18,5 +18,15 @@ const enumOkCate = (categoria) => {
     };
   }
 };
+const enumOkValora = (valoracion) => {
+  const enumValor = ["1","2","3","4","5"];
+  if (enumValor.includes(valoracion)) {
+    return { check: true, valoracion };
+  } else {
+    return {
+      check: false,
+    };
+  }
+};
 
-module.exports ={enumOk,enumOkCate}
+module.exports ={enumOk,enumOkCate,enumOkValora}

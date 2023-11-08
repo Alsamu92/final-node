@@ -21,6 +21,7 @@ const ArticuloSchema = new Schema(
       type: String,
       required: false,
     },
+    comentarios: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comentario" }],
     supermercados: [{ type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },

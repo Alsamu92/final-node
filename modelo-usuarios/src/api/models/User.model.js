@@ -30,6 +30,7 @@ const UserSchema = new mongoose.Schema(
       enum: ['admin', 'user'],
       required: true,
     },
+    comentarios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comentario' }],
     confirmationCode: {
       type: Number,
       required: true,
