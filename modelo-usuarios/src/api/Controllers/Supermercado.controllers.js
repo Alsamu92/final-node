@@ -188,6 +188,7 @@ const update = async (req, res, next) => {
         image: req.file?.path ? catchImg : oldImg,
         name: req.body?.name ? req.body?.name : SuperById.name,
         price: req.body?.price ? req.body?.price : SuperById.price,
+        numeroLocales: req.body?.numeroLocales ? req.body?.numeroLocales : SuperById.numeroLocales,
       };
 
       try {
@@ -242,12 +243,11 @@ const update = async (req, res, next) => {
 //todo CONTROLADOR BUSCAR POR Lugar
 const buscarPorLugarSuper = async (req, res, nex) => {
   try {
-    const {usid} = req.params;
+    const {_id} = req.user;
     const todosSupers = await Supermercado.find();
-    console.log(usid)
-   
-  const usuarioBuscado= await User.findById(usid)
-
+    
+  const usuarioBuscado= await User.findById(_id)
+  console.log("hola",_id)
     const supersCoincidentes= []
   
       todosSupers.forEach((supermercado)=>{
@@ -301,6 +301,35 @@ const mostrarConMasArt = async (req, res, next) => {
     });
   }
 };
+//todo------------------------------------------------------------------------------------------------------------------------------------
+//todo-----------------Ordenar por número de locales-------------------------------------------------------------------------------------------------------------------
+const mostrarConMasLocales = async (req, res, next) => {
+  try {
+    const TodosLosSuper = await Supermercado.find();
+    if (TodosLosSuper.length > 0) {
+    const resultados = TodosLosSuper.map((supermercado) => ({
+      name: supermercado.name,
+      locCount:supermercado.numeroLocales
+    }));
+
+    resultados.sort((a, b) => b.locCount - a.locCount);
+
+   
+    
+      return res.status(200).json(resultados);
+    } else {
+      return res.status(404).json({
+        error: "No se encontraron supermercados",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "Error al buscar",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   crearSupermercado,
   toggleArticulo,
@@ -310,5 +339,7 @@ module.exports = {
   update,
   buscarPorLugarSuper,
   getAll,
-  mostrarConMasArt
+  mostrarConMasArt,
+  mostrarConMasLocales,
+
 };

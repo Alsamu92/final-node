@@ -12,7 +12,7 @@ const ArticuloSchema = new Schema(
     oferta: { type: Boolean, required: false, unique: false },
     descripcion: { type: String, required: false, unique: false },
     categoria:{enum:["limpieza","alimentacion","juguetes","textil","electronica","drogueria"], type:String, required:true},
-    comentarios:[{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  
     price: {
       type:String,
       required: true,

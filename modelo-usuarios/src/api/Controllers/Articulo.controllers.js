@@ -1,3 +1,4 @@
+const setError = require("../../../helpers/handle-error");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const { enumOkCate } = require("../../utils/enumOk");
 const Articulo = require("../models/Articulo.model");
@@ -246,7 +247,20 @@ const ordenarLikes = async (req, res, next) => {
 };
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+const VerOferta=async(req,res,next)=>{
+try {
+  const todosLosArticulos=await Articulo.find()
+  const todosEnOferta=[]
+  todosLosArticulos.forEach((articulo)=>{
+if(articulo.oferta==true){
+  todosEnOferta.push(articulo)
+}
+  })
+  return res.status(200).json(todosEnOferta)
+} catch (error) {
+  return next(setError(500, error.message || "Error general"));
+}
+}
 
 
 module.exports = {
@@ -257,5 +271,5 @@ module.exports = {
   deleteArticulo,
   update,
   getByCategoria,ordenarLikes,
-  
+  VerOferta
 };

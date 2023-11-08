@@ -9,7 +9,7 @@ const { generateToken } = require("../../utils/token");
 const User = require("../models/User.model");
 const nodemailer = require("nodemailer");
 const validator = require("validator");
-const enumOk = require("../../utils/enumOk");
+const {enumOk}= require("../../utils/enumOk");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const Supermercado = require("../models/Supermercado.model");
 const Articulo = require("../models/Articulo.model");
@@ -496,11 +496,45 @@ const borrarUser = async (req, res, nex) => {
   try {
     await User.findByIdAndDelete(req.user?._id);
     deleteImgCloudinary(req.user?.image);
+    try {
+      await User.updateMany(
+        { followed: req.user?._id },
+        { $pull: {followed: req.user?._id } }
+      );
+    try {
+      await Articulo.updateMany(
+        { likes: req.user?._id },
+        { $pull: { likes: req.user?._id } }
+      );
 
-    const testDelete = await User.findById(req.user?._id);
-    return res
-      .status(testDelete ? 404 : 200)
-      .json({ deleteTest: testDelete ? false : true });
+      try {
+        await Supermercado.updateMany(
+          { likes: req.user?._id },
+          { $pull: { likes: req.user?._id } }
+        );
+
+        const existUser = await User.findById(req.user?._id);
+        return res.status(existUser ? 404 : 200).json({
+          deleteTest: existUser ? false : true,
+        });
+      } catch (error) {
+        return res.status(404).json({
+          error: 'error catch update Supermercado',
+          message: error.message,
+        });
+      }
+    } catch (error) {
+      return res.status(404).json({
+        error: 'error catch al actualizar el artículo',
+        message: error.message,
+      });
+    }
+    } catch (error) {
+      return res.status(404).json({
+        error: 'error catch al actualizar el usuario',
+        message: error.message,
+      });
+    }
   } catch (error) {
     return res.status(404).json({
       message: "Error al borrar",
@@ -804,7 +838,7 @@ const seguirUser = async (req, res, next) => {
 
           return res.status(200).json({
             userUpdate: await User.findById(_id),
-            movieUpdate: await User.findById(userSeguido),
+            userDosUpdate: await User.findById(userSeguido),
             action: `pull user ${userSeguido}`,
           });
         } catch (error) {
@@ -832,7 +866,7 @@ const seguirUser = async (req, res, next) => {
 
           return res.status(200).json({
             userUpdate: await User.findById(_id),
-            movieUpdate: await User.findById(userSeguido),
+            userDosUpdate: await User.findById(userSeguido),
             action: `push user ${userSeguido}`,
           });
         } catch (error) {

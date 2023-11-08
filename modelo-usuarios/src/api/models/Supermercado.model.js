@@ -8,7 +8,6 @@ const SuperMercadoSchema = new mongoose.Schema(
     articulos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Articulo" }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     //aqui entra el id de los usuarios a los que les gusta este super
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );
