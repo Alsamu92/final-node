@@ -13,6 +13,7 @@ const {enumOk}= require("../../utils/enumOk");
 const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const Supermercado = require("../models/Supermercado.model");
 const Articulo = require("../models/Articulo.model");
+const Comentario = require("../models/Comentarios.model");
 
 //todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
 const subirUser = async (req, res, next) => {
@@ -54,13 +55,13 @@ const subirUser = async (req, res, next) => {
           };
           transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
-              console.log(error);
+              // console.log(error);
               return res.status(404).json({
                 user: usuarioGuardado,
                 confirmationCode: "error",
               });
             } else {
-              console.log(`email mandado` + info.response);
+              // console.log(`email mandado` + info.response);
               return res.status(200).json({
                 user: usuarioGuardado,
                 confirmationCode,
@@ -242,13 +243,13 @@ const sendCode = async (req, res, next) => {
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log(error);
+        // console.log(error);
         return res.status(404).json({
           user: userDB,
           confirmationCode: "error, resend code",
         });
       } else {
-        console.log("Email sent: " + info.response);
+        // console.log("Email sent: " + info.response);
         return res.status(200).json({
           user: userDB,
           confirmationCode: userDB.confirmationCode,
@@ -319,12 +320,12 @@ const resendCode = async (req, res, next) => {
 
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          console.log(error);
+          // console.log(error);
           return res.status(404).json({
             resend: false,
           });
         } else {
-          console.log("Email enviado: " + info.response);
+          // console.log("Email enviado: " + info.response);
           return res.status(200).json({
             resend: true,
           });
@@ -492,47 +493,54 @@ const cambiarPass = async (req, res, next) => {
 //todo---------------------------------------------------------------------
 //todo-----------CONTROLADOR PARA BORRAR USUARIO-------------------
 
-const borrarUser = async (req, res, nex) => {
+const borrarUser = async (req, res, next) => {
   try {
-    await User.findByIdAndDelete(req.user?._id);
+    const { _id } = req.user;
+    console.log(req.user);
+
+    // Eliminar el usuario por su ID
+    await User.findByIdAndDelete(_id);
+
+    // Eliminar la imagen asociada al usuario en Cloudinary
     deleteImgCloudinary(req.user?.image);
-    try {
-      await User.updateMany(
-        { followed: req.user?._id },
-        { $pull: {followed: req.user?._id } }
-      );
-    try {
+
+    // Actualizar los documentos en la colección "User" eliminando el ID del usuario del array "followed"
+    await User.updateMany(
+      { followed: _id },
+      { $pull: { followed: _id } }
+    );
+
+    // Actualizar los documentos en las colecciones "Articulo" y "Supermercado" eliminando el ID del usuario del array "likes"
+    await Articulo.updateMany(
+      { likes: _id },
+      { $pull: { likes: _id } },
+    
+    );
+
+    await Supermercado.updateMany(
+      { likes: _id },
+      { $pull: { likes: _id } }
+    );
+
+    // Eliminar todos los comentarios hechos por el usuario
+    const comentarios = await Comentario.find({ publicadoPor: _id });
+//Uso for of porque foreach me pide que haga asincrona la callback y prefiero asi.
+    for (const comentario of comentarios) {
+      await Comentario.findByIdAndDelete(comentario._id);
       await Articulo.updateMany(
-        { likes: req.user?._id },
-        { $pull: { likes: req.user?._id } }
-      );
-
-      try {
-        await Supermercado.updateMany(
-          { likes: req.user?._id },
-          { $pull: { likes: req.user?._id } }
-        );
-
-        const existUser = await User.findById(req.user?._id);
-        return res.status(existUser ? 404 : 200).json({
-          deleteTest: existUser ? false : true,
-        });
-      } catch (error) {
-        return res.status(404).json({
-          error: 'error catch update Supermercado',
-          message: error.message,
-        });
-      }
-    } catch (error) {
-      return res.status(404).json({
-        error: 'error catch al actualizar el artículo',
-        message: error.message,
-      });
+        { comentarios: comentario._id },
+        { $pull: { comentarios: comentario._id } },)
     }
-    } catch (error) {
+
+    const existUser = await User.findById(_id);
+
+    if (existUser) {
       return res.status(404).json({
-        error: 'error catch al actualizar el usuario',
-        message: error.message,
+        deleteTest: false,
+      });
+    } else {
+      return res.status(200).json({
+        deleteTest: true,
       });
     }
   } catch (error) {
@@ -542,6 +550,7 @@ const borrarUser = async (req, res, nex) => {
     });
   }
 };
+
 //todo-----------CONTROLADOR PARA ACTUALIZAR USUARIO-------------------
 
 const update = async (req, res, next) => {
