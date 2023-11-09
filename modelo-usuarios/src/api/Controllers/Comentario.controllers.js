@@ -157,4 +157,60 @@ const buscarValoracion = async (req, res, nex) => {
       });
     }
   };
-module.exports = { crearComentario,borrarComentario,buscarValoracion,ordenarPorValoracion };
+  //todo CONTROLADOR UPDATE
+
+const update = async (req, res, next) => {
+  await Comentario.syncIndexes();
+  try {
+    const { id } = req.params;
+    const comentById = await Comentario.findById(id);
+    if (comentById) {
+      const customBody = {
+        _id: comentById._id,
+        publicadoPor:comentById.publicadoPor,
+        contenido: req.body?.contenido ? req.body?.contenido : comentById.price,
+       valoracion: req.body?.valoracion? req.body?.valoracion : comentById.valoracion,
+      };
+
+      try {
+        await Comentario.findByIdAndUpdate(id, customBody);
+        
+        const comentByIdUpdate = await Comentario.findById(id);
+
+        const elementUpdate = Object.keys(req.body);
+
+        let test = {};
+
+        elementUpdate.forEach((item) => {
+          if (req.body[item] == comentByIdUpdate[item]) {
+            test[item] = true;
+          } else {
+            test[item] = false;
+          }
+        });
+
+        let acc = 0;
+        for (clave in test) {
+          test[clave] == false && acc++;
+        }
+
+        if (acc > 0) {
+          return res.status(404).json({
+            dataTest: test,
+            update: false,
+          });
+        } else {
+          return res.status(200).json({
+            dataTest: test,
+            update: true,
+          });
+        }
+      } catch (error) {}
+    } else {
+      return res.status(404).json("este comentario no existe");
+    }
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+};
+module.exports = { crearComentario,borrarComentario,buscarValoracion,ordenarPorValoracion,update };
