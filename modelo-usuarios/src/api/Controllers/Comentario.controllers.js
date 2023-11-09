@@ -131,4 +131,30 @@ const buscarValoracion = async (req, res, nex) => {
         });
       }
   };
-module.exports = { crearComentario,borrarComentario,buscarValoracion };
+  const ordenarPorValoracion = async (req, res, next) => {
+    try {
+      const TodosLosComentarios = await Comentario.find();
+      if (TodosLosComentarios.length > 0) {
+      const resultados = TodosLosComentarios.map((comentario) => ({
+        articuloRef: comentario.articuloRef,
+        valCount:comentario.valoracion
+      }));
+  
+      resultados.sort((a, b) => b.valCountCount - a.valCount);
+  
+     
+      
+        return res.status(200).json(resultados);
+      } else {
+        return res.status(404).json({
+          error: "No se encontraron comentarios",
+        });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        error: "Error al buscar",
+        message: error.message,
+      });
+    }
+  };
+module.exports = { crearComentario,borrarComentario,buscarValoracion,ordenarPorValoracion };

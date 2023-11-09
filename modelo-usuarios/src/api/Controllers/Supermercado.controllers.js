@@ -98,28 +98,34 @@ const toggleArticulo = async (req, res, next) => {
 
 //todo CONTROLADOR BORRAR SUPER
 
-const borrarSuper = async (req, res, nex) => {
+const borrarSuper = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const borrarSupermercado = await Supermercado.findByIdAndDelete(id);
-    if (borrarSupermercado) {
-      const findByIdSuper = await Supermercado.findById(id);
-      try {
-        //si hemos borrado el super debemos eliminar le id del super de los articulos
-       const test= await Articulo.updateMany(
-          {supermercados:id},
-          {$pull: {supermercados:id}})
-          console.log(test)
-        return res.status(findByIdSuper ? 404 : 200).json({
-          deleteTest: findByIdSuper ? false : true,
-        });
-      } catch (error) {}
-     
-    } else {
-      return res.status(404).json("Este súper no está");
+    const sup = await Supermercado.findByIdAndDelete(id);
+
+    try {
+      const test = await Articulo.updateMany(
+        { supermercados: id },
+        { $pull: { supermercados: id } }
+      );
+      await User.updateMany(
+        { SupermercadoFav: id },
+        { $pull: { SupermercadoFav: id } }
+      );
+      console.log(test);
+
+      return res.status(sup ? 200 : 404).json({
+        deleteTest: sup ? true : false,
+      });
+
+    } catch (error) {
+      console.error("Error actualizando referencias:", error);
+      return res.status(500).json({ error: "Error interno del servidor" });
     }
+
   } catch (error) {
-    return res.status(404).json(error);
+    console.error("Error eliminando artículo:", error);
+    return res.status(404).json({ error: "Artículo no encontrado" });
   }
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------

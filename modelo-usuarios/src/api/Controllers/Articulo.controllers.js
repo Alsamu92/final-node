@@ -3,6 +3,7 @@ const { deleteImgCloudinary } = require("../../middleware/files.middleware");
 const { enumOkCate } = require("../../utils/enumOk");
 const Articulo = require("../models/Articulo.model");
 const Supermercado = require("../models/Supermercado.model");
+const User = require("../models/User.model");
 
 //todo CONTROLADOR POST
 const create = async (req, res, next) => {
@@ -120,28 +121,33 @@ const deleteArticulo = async (req, res, next) => {
   try {
     const { id } = req.params;
     const article = await Articulo.findByIdAndDelete(id);
-    if (article) {
-      const findByIdArticulo = await Articulo.findById(id);
-try {
- const test=await Supermercado.updateMany(
-  {articulos:id},
-  {$pull:{articulos:id}}
- ) 
- console.log(test)
-      return res.status(findByIdArticulo ? 404 : 200).json({
-        deleteTest: findByIdArticulo ? false : true,
+
+    try {
+      const test = await Supermercado.updateMany(
+        { articulos: id },
+        { $pull: { articulos: id } }
+      );
+      await User.updateMany(
+        { ArticuloFav: id },
+        { $pull: { ArticuloFav: id } }
+      );
+      console.log(test);
+
+      return res.status(article ? 200 : 404).json({
+        deleteTest: article ? true : false,
       });
- 
-} catch (error) {}
-    
-      
-    } else {
-      return res.status(404).json("Este artículo no está");
+
+    } catch (error) {
+      console.error("Error actualizando referencias:", error);
+      return res.status(500).json({ error: "Error interno del servidor" });
     }
+
   } catch (error) {
-    return res.status(404).json(error);
+    console.error("Error eliminando artículo:", error);
+    return res.status(404).json({ error: "Artículo no encontrado" });
   }
 };
+
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 
 //todo CONTROLADOR UPDATE

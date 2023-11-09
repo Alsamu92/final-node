@@ -27,3 +27,4 @@ SuperRoutes.get("/locales/locales/", mostrarConMasLocales);
 SuperRoutes.patch("/:id", update);
 
 module.exports = SuperRoutes;
+
