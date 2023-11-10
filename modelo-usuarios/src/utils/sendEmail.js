@@ -1,17 +1,14 @@
-
 const dotenv = require('dotenv');
 dotenv.config();
 const nodemailer = require('nodemailer');
 const { setSendEmail } = require('../state/state.data');
 
 const sendEmail = async (userEmail, name, confirmationCode) => {
-
   setSendEmail(false);
 
   const email = process.env.EMAIL;
   const password = process.env.PASSWORD;
 
- 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -20,8 +17,6 @@ const sendEmail = async (userEmail, name, confirmationCode) => {
     },
   });
 
-
-
   const mailOptions = {
     from: email,
     to: userEmail,
@@ -29,8 +24,7 @@ const sendEmail = async (userEmail, name, confirmationCode) => {
     text: `tu codigo es ${confirmationCode}, gracias por confiar en nosotros ${name}`,
   };
 
-
-   transporter.sendMail(mailOptions, function (error, info) {
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
       setSendEmail(false);
@@ -38,7 +32,7 @@ const sendEmail = async (userEmail, name, confirmationCode) => {
       console.log('Email send: ' + info.response);
       setSendEmail(true);
     }
-  })
+  });
 };
 
 module.exports = sendEmail;

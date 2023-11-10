@@ -1,19 +1,19 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 
-const setError = require("../../../helpers/handle-error");
-const { getSendEmail, setSendEmail } = require("../../state/state.data");
-const randomCode = require("../../utils/randomCode");
-const randomPassword = require("../../utils/randomPassword");
-const sendEmail = require("../../utils/sendEmail");
-const { generateToken } = require("../../utils/token");
-const User = require("../models/User.model");
-const nodemailer = require("nodemailer");
-const validator = require("validator");
-const {enumOk}= require("../../utils/enumOk");
-const { deleteImgCloudinary } = require("../../middleware/files.middleware");
-const Supermercado = require("../models/Supermercado.model");
-const Articulo = require("../models/Articulo.model");
-const Comentario = require("../models/Comentarios.model");
+const setError = require('../../../helpers/handle-error');
+const { getSendEmail, setSendEmail } = require('../../state/state.data');
+const randomCode = require('../../utils/randomCode');
+const randomPassword = require('../../utils/randomPassword');
+const sendEmail = require('../../utils/sendEmail');
+const { generateToken } = require('../../utils/token');
+const User = require('../models/User.model');
+const nodemailer = require('nodemailer');
+const validator = require('validator');
+const { enumOk } = require('../../utils/enumOk');
+const { deleteImgCloudinary } = require('../../middleware/files.middleware');
+const Supermercado = require('../models/Supermercado.model');
+const Articulo = require('../models/Articulo.model');
+const Comentario = require('../models/Comentarios.model');
 
 //todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
 const subirUser = async (req, res, next) => {
@@ -33,7 +33,7 @@ const subirUser = async (req, res, next) => {
         newUser.image = catchImg;
       } else {
         newUser.image =
-          "https://res.cloudinary.com/dhkbe6djz/image/upload/v1689099748/UserFTProyect/tntqqfidpsmcmqdhuevb.png";
+          'https://res.cloudinary.com/dhkbe6djz/image/upload/v1689099748/UserFTProyect/tntqqfidpsmcmqdhuevb.png';
       }
       try {
         const usuarioGuardado = await newUser.save();
@@ -41,7 +41,7 @@ const subirUser = async (req, res, next) => {
           const emailEnv = process.env.EMAIL;
           const password = process.env.PASSWORD;
           const transporter = nodemailer.createTransport({
-            service: "gmail",
+            service: 'gmail',
             auth: {
               user: emailEnv,
               pass: password,
@@ -50,15 +50,15 @@ const subirUser = async (req, res, next) => {
           const mailOptions = {
             from: emailEnv,
             to: email,
-            subject: "Confirmation code",
+            subject: 'Confirmation code',
             text: `tu codigo es ${confirmationCode}, gracias por confiar en nosotros ${name}`,
           };
-          transporter.sendMail(mailOptions, function (error, info) {
+          transporter.sendMail(mailOptions, function (error) {
             if (error) {
               // console.log(error);
               return res.status(404).json({
                 user: usuarioGuardado,
-                confirmationCode: "error",
+                confirmationCode: 'error',
               });
             } else {
               // console.log(`email mandado` + info.response);
@@ -72,20 +72,20 @@ const subirUser = async (req, res, next) => {
       } catch (error) {
         req.file && deleteImgCloudinary(catchImg);
         return res.status(404).json({
-          error: "error al guardar",
+          error: 'error al guardar',
           message: error.message,
         });
       }
     } else {
       if (req.file) deleteImgCloudinary(catchImg);
-      return res.status(404).json("El ususario ya existe");
+      return res.status(404).json('El ususario ya existe');
     }
   } catch (error) {
     req.file?.path && deleteImgCloudinary(catchImg);
     next(error);
     return (
       res.status(404).json({
-        mensaje: "Error al crear",
+        mensaje: 'Error al crear',
         error: error,
       }) && next(error)
     );
@@ -115,7 +115,7 @@ const registerEstado = async (req, res, next) => {
       if (req.file) {
         newUser.image = req.file.path;
       } else {
-        newUser.image = "https://pic.onlinewebfonts.com/svg/img_181369.png";
+        newUser.image = 'https://pic.onlinewebfonts.com/svg/img_181369.png';
       }
 
       try {
@@ -135,7 +135,7 @@ const registerEstado = async (req, res, next) => {
               setSendEmail(false);
               return res.status(404).json({
                 user: userSave,
-                confirmationCode: "error, resend code",
+                confirmationCode: 'error, resend code',
               });
             }
           }, 1400);
@@ -143,19 +143,19 @@ const registerEstado = async (req, res, next) => {
       } catch (error) {
         req.file && deleteImgCloudinary(catchImg);
         return res.status(404).json({
-          error: "error catch save",
+          error: 'error catch save',
           message: error.message,
         });
       }
     } else {
       if (req.file) deleteImgCloudinary(catchImg);
-      return res.status(409).json("this user already exist");
+      return res.status(409).json('this user already exist');
     }
   } catch (error) {
     req.file && deleteImgCloudinary(catchImg);
     return (
       res.status(404).json({
-        error: "error catch general",
+        error: 'error catch general',
         message: error.message,
       }) && next(error)
     );
@@ -180,7 +180,7 @@ const registerRedirect = async (req, res, next) => {
       if (req.file) {
         newUser.image = req.file.path;
       } else {
-        newUser.image = "https://pic.onlinewebfonts.com/svg/img_181369.png";
+        newUser.image = 'https://pic.onlinewebfonts.com/svg/img_181369.png';
       }
 
       try {
@@ -194,20 +194,20 @@ const registerRedirect = async (req, res, next) => {
       } catch (error) {
         req.file && deleteImgCloudinary(catchImg);
         return res.status(404).json({
-          error: "error al guardar",
+          error: 'error al guardar',
           message: error.message,
         });
       }
     } else {
       req.file && deleteImgCloudinary(catchImg);
-      return res.status(409).json("Este usuario ya está registrado");
+      return res.status(409).json('Este usuario ya está registrado');
     }
 
     req.file && deleteImgCloudinary(catchImg);
   } catch (error) {
     return (
       res.status(404).json({
-        error: "error catch general",
+        error: 'error catch general',
         message: error.message,
       }) && next(error)
     );
@@ -227,7 +227,7 @@ const sendCode = async (req, res, next) => {
     const password = process.env.PASSWORD;
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: emailEnv,
         pass: password,
@@ -237,16 +237,16 @@ const sendCode = async (req, res, next) => {
     const mailOptions = {
       from: emailEnv,
       to: userDB.email,
-      subject: "Confirmation code",
+      subject: 'Confirmation code',
       text: `Tu código es ${userDB.confirmationCode}, gracias por confiar en nosotros ${userDB.name}`,
     };
 
-    transporter.sendMail(mailOptions, function (error, info) {
+    transporter.sendMail(mailOptions, function (error) {
       if (error) {
         // console.log(error);
         return res.status(404).json({
           user: userDB,
-          confirmationCode: "error, resend code",
+          confirmationCode: 'error, resend code',
         });
       } else {
         // console.log("Email sent: " + info.response);
@@ -259,7 +259,7 @@ const sendCode = async (req, res, next) => {
   } catch (error) {
     return (
       res.status(404).json({
-        error: "Error en el catch general",
+        error: 'Error en el catch general',
         message: error.message,
       }) && next(error)
     );
@@ -285,10 +285,10 @@ const login = async (req, res, next) => {
           token,
         });
       } else {
-        return res.status(404).json("La contraseña no coincide");
+        return res.status(404).json('La contraseña no coincide');
       }
     } else {
-      return res.status(404).json("usuario no registrado");
+      return res.status(404).json('usuario no registrado');
     }
   } catch (error) {
     return next(error);
@@ -302,7 +302,7 @@ const resendCode = async (req, res, next) => {
     const password = process.env.PASSWORD;
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: email,
         pass: password,
@@ -314,11 +314,11 @@ const resendCode = async (req, res, next) => {
       const mailOptions = {
         from: email,
         to: req.body.email,
-        subject: "Confirmation code",
+        subject: 'Confirmation code',
         text: `tu codigo es ${userExist.confirmationCode}`,
       };
 
-      transporter.sendMail(mailOptions, (error, info) => {
+      transporter.sendMail(mailOptions, (error) => {
         if (error) {
           // console.log(error);
           return res.status(404).json({
@@ -332,10 +332,10 @@ const resendCode = async (req, res, next) => {
         }
       });
     } else {
-      return res.status(404).json("Usuario no encontrado");
+      return res.status(404).json('Usuario no encontrado');
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error general "));
+    return next(setError(500, error.message || 'Error general '));
   }
 };
 //todo---------------------------------------------------------------------
@@ -346,7 +346,7 @@ const checkUser = async (req, res, next) => {
     const { email, confirmationCode } = req.body;
     const userExist = await User.findOne({ email });
     if (!userExist) {
-      return res.status(404).json("Usuario no encontrado");
+      return res.status(404).json('Usuario no encontrado');
     } else {
       if (userExist.confirmationCode == confirmationCode) {
         try {
@@ -357,7 +357,7 @@ const checkUser = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "error en el catch update",
+            error: 'error en el catch update',
             message: error.message,
           });
         }
@@ -368,13 +368,13 @@ const checkUser = async (req, res, next) => {
           userExist,
           check: false,
           delete: (await User.findById(userExist._id))
-            ? "Error al borrar usuario"
-            : "Usuario borrado",
+            ? 'Error al borrar usuario'
+            : 'Usuario borrado',
         });
       }
     }
   } catch (error) {
-    return next(setError(500, error.message || "error general"));
+    return next(setError(500, error.message || 'error general'));
   }
 };
 
@@ -390,10 +390,10 @@ const cambiarContrasena = async (req, res, next) => {
         `http://localhost:8080/api/v1/usuario/sendPassword/${userDb._id}`
       );
     } else {
-      return res.status(404).json("Usuario no registrado");
+      return res.status(404).json('Usuario no registrado');
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error general"));
+    return next(setError(500, error.message || 'Error general'));
   }
 };
 //todo REDIRECT ---SENDPASSWORD-------------------
@@ -407,7 +407,7 @@ const sendPassword = async (req, res, next) => {
     const email = process.env.EMAIL;
     const password = process.env.PASSWORD;
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: email,
         pass: password,
@@ -416,12 +416,12 @@ const sendPassword = async (req, res, next) => {
     const mailOptions = {
       from: email,
       to: userDb.email,
-      subject: "Nuevo código de acceso",
+      subject: 'Nuevo código de acceso',
       text: `Usuario: ${userDb.name}. Tu nuevo código de acceso es  ${contrasenaSegura} Hemos enviado esto porque tenemos una solicitud de cambio de contraseña, si no has sido ponte en contacto con nosotros, gracias.`,
     };
-    transporter.sendMail(mailOptions, async function (error, info) {
+    transporter.sendMail(mailOptions, async function (error) {
       if (error) {
-        return res.status(404).json("No se ha podido enviar el email");
+        return res.status(404).json('No se ha podido enviar el email');
       } else {
         const newPass = bcrypt.hashSync(contrasenaSegura, 10);
         await User.findByIdAndUpdate(id, { password: newPass });
@@ -443,14 +443,14 @@ const sendPassword = async (req, res, next) => {
           }
         } catch (error) {
           return res.status(404).json({
-            error: "error catch al actualizar",
+            error: 'error catch al actualizar',
             message: error.message,
           });
         }
       }
     });
   } catch (error) {
-    return next(setError(500, error.message || "Error general"));
+    return next(setError(500, error.message || 'Error general'));
   }
 };
 
@@ -474,26 +474,26 @@ const cambiarPass = async (req, res, next) => {
           }
         } catch (error) {
           return res.status(404).json({
-            error: "Error al actualizar la contraseña",
+            error: 'Error al actualizar la contraseña',
             message: error.message,
           });
         }
       } else {
-        return res.status(404).json("La contraseña no coincide");
+        return res.status(404).json('La contraseña no coincide');
       }
     } else {
-      return res.status(404).json("La contraseña no es segura");
+      return res.status(404).json('La contraseña no es segura');
     }
   } catch (error) {
     return next(
-      setError(500, error.message || "Error general al cambiar contaseña")
+      setError(500, error.message || 'Error general al cambiar contaseña')
     );
   }
 };
 //todo---------------------------------------------------------------------
 //todo-----------CONTROLADOR PARA BORRAR USUARIO-------------------
 
-const borrarUser = async (req, res, next) => {
+const borrarUser = async (req, res) => {
   try {
     const { _id } = req.user;
     console.log(req.user);
@@ -505,31 +505,22 @@ const borrarUser = async (req, res, next) => {
     deleteImgCloudinary(req.user?.image);
 
     // Actualizar los documentos en la colección "User" eliminando el ID del usuario del array "followed"
-    await User.updateMany(
-      { followed: _id },
-      { $pull: { followed: _id } }
-    );
+    await User.updateMany({ followed: _id }, { $pull: { followed: _id } });
 
     // Actualizar los documentos en las colecciones "Articulo" y "Supermercado" eliminando el ID del usuario del array "likes"
-    await Articulo.updateMany(
-      { likes: _id },
-      { $pull: { likes: _id } },
-    
-    );
+    await Articulo.updateMany({ likes: _id }, { $pull: { likes: _id } });
 
-    await Supermercado.updateMany(
-      { likes: _id },
-      { $pull: { likes: _id } }
-    );
+    await Supermercado.updateMany({ likes: _id }, { $pull: { likes: _id } });
 
     // Eliminar todos los comentarios hechos por el usuario
     const comentarios = await Comentario.find({ publicadoPor: _id });
-//Uso for of porque foreach me pide que haga asincrona la callback y prefiero asi.
+    //Uso for of porque foreach me pide que haga asincrona la callback y prefiero asi.
     for (const comentario of comentarios) {
       await Comentario.findByIdAndDelete(comentario._id);
       await Articulo.updateMany(
         { comentarios: comentario._id },
-        { $pull: { comentarios: comentario._id } },)
+        { $pull: { comentarios: comentario._id } }
+      );
     }
 
     const existUser = await User.findById(_id);
@@ -545,7 +536,7 @@ const borrarUser = async (req, res, next) => {
     }
   } catch (error) {
     return res.status(404).json({
-      message: "Error al borrar",
+      message: 'Error al borrar',
       error: error.message,
     });
   }
@@ -597,7 +588,7 @@ const update = async (req, res, next) => {
             });
           } else {
             testUpdate.push({
-              [item]: "La información no puede ser igual a la anterior",
+              [item]: 'La información no puede ser igual a la anterior',
             });
           }
         } else {
@@ -624,14 +615,14 @@ const update = async (req, res, next) => {
     } catch (error) {
       req.file && deleteImgCloudinary(catchImg);
       return res.status(404).json({
-        error: "error catch update",
+        error: 'error catch update',
         message: error.message,
       });
     }
   } catch (error) {
     req.file && deleteImgCloudinary(catchImg);
     return next(
-      setError(500, error.message || "Error general to UPDATE with AUTH")
+      setError(500, error.message || 'Error general to UPDATE with AUTH')
     );
   }
 };
@@ -660,13 +651,13 @@ const hacerSuperFav = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "Error al actualizar pull de los supers",
+            error: 'Error al actualizar pull de los supers',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "Error al actualizar pull",
+          error: 'Error al actualizar pull',
           message: error.message,
         });
       }
@@ -687,19 +678,19 @@ const hacerSuperFav = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "Error al actualizar push de los supers",
+            error: 'Error al actualizar push de los supers',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "Error al actualizar push",
+          error: 'Error al actualizar push',
           message: error.message,
         });
       }
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error en el catch general"));
+    return next(setError(500, error.message || 'Error en el catch general'));
   }
 };
 
@@ -728,13 +719,13 @@ const hacerArticuloFav = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "Error al actualizar pull de los artículos",
+            error: 'Error al actualizar pull de los artículos',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "Error al actualizar pull",
+          error: 'Error al actualizar pull',
           message: error.message,
         });
       }
@@ -755,19 +746,19 @@ const hacerArticuloFav = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "Error al actualizar push de los artículos",
+            error: 'Error al actualizar push de los artículos',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "Error al actualizar push",
+          error: 'Error al actualizar push',
           message: error.message,
         });
       }
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error en el catch general"));
+    return next(setError(500, error.message || 'Error en el catch general'));
   }
 };
 
@@ -776,33 +767,33 @@ const hacerArticuloFav = async (req, res, next) => {
 
 //todo CONTROLADOR BUSCAR POR ID
 
-const BuscarUser = async (req, res, next) => {
+const BuscarUser = async (req, res) => {
   try {
     const { id } = req.params;
     const userPorId = await User.findById(id);
     if (userPorId) {
       return res.status(200).json(userPorId);
     } else {
-      return res.status(404).json("No se ha encontrado");
+      return res.status(404).json('No se ha encontrado');
     }
   } catch (error) {
-    return res.status(404).json("No encontrado");
+    return res.status(404).json('No encontrado');
   }
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 //todo CONTROLADOR BUSCAR Todos
 
-const getAll = async (rq, res, next) => {
+const getAll = async (rq, res) => {
   try {
     const todosLosUsers = await User.find();
     if (todosLosUsers.length > 0) {
       return res.status(200).json(todosLosUsers);
     } else {
-      return res.status(404).json("No se han encontrado usuarios");
+      return res.status(404).json('No se han encontrado usuarios');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "error al buscar",
+      error: 'error al buscar',
       message: error.message,
     });
   }
@@ -810,18 +801,18 @@ const getAll = async (rq, res, next) => {
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 //todo CONTROLADOR BUSCAR POR NOMBRE
-const buscarNameUser = async (req, res, nex) => {
+const buscarNameUser = async (req, res) => {
   try {
     const { name } = req.params;
     const nombreUser = await User.find({ name });
     if (nombreUser.length > 0) {
       return res.status(200).json(nombreUser);
     } else {
-      return res.status(404).json("No se ha encontado este usuario");
+      return res.status(404).json('No se ha encontado este usuario');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "No encontrado",
+      error: 'No encontrado',
       message: error.message,
     });
   }
@@ -852,13 +843,13 @@ const seguirUser = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "error catch update pull",
+            error: 'error catch update pull',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "error catch update User pull",
+          error: 'error catch update User pull',
           message: error.message,
         });
       }
@@ -880,19 +871,19 @@ const seguirUser = async (req, res, next) => {
           });
         } catch (error) {
           return res.status(404).json({
-            error: "error catch update push",
+            error: 'error catch update push',
             message: error.message,
           });
         }
       } catch (error) {
         return res.status(404).json({
-          error: "error catch update User pull",
+          error: 'error catch update User pull',
           message: error.message,
         });
       }
     }
   } catch (error) {
-    return next(setError(500, error.message || "Error general to DELETE"));
+    return next(setError(500, error.message || 'Error general to DELETE'));
   }
 };
 
@@ -914,4 +905,5 @@ module.exports = {
   buscarNameUser,
   BuscarUser,
   seguirUser,
+  resendCode,
 };

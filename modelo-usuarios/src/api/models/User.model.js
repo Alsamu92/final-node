@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const validator = require('validator');
-const bcrypt=require("bcrypt")
+const bcrypt = require('bcrypt');
 const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema(
       validate: [validator.isEmail, 'Email not valid'],
     },
     name: { type: String, required: true, trim: true, unique: true },
-    provincia: { type: String, required: false, trim: true, unique: false},
+    provincia: { type: String, required: false, trim: true, unique: false },
     password: {
       type: String,
       required: true,
@@ -43,8 +43,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     ArticuloFav: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Articulo' }],
-   
-    SupermercadoFav: [{ type: mongoose.Schema.Types.ObjectId, ref: "Supermercado" }],
+
+    SupermercadoFav: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Supermercado' },
+    ],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     followed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
@@ -60,7 +62,6 @@ UserSchema.pre('save', async function (next) {
     next('Error hashing password', error);
   }
 });
-
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;

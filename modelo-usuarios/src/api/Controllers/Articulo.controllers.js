@@ -1,12 +1,12 @@
-const setError = require("../../../helpers/handle-error");
-const { deleteImgCloudinary } = require("../../middleware/files.middleware");
-const { enumOkCate } = require("../../utils/enumOk");
-const Articulo = require("../models/Articulo.model");
-const Supermercado = require("../models/Supermercado.model");
-const User = require("../models/User.model");
+const setError = require('../../../helpers/handle-error');
+const { deleteImgCloudinary } = require('../../middleware/files.middleware');
+const { enumOkCate } = require('../../utils/enumOk');
+const Articulo = require('../models/Articulo.model');
+const Supermercado = require('../models/Supermercado.model');
+const User = require('../models/User.model');
 
 //todo CONTROLADOR POST
-const create = async (req, res, next) => {
+const create = async (req, res) => {
   try {
     let catchImg = req.file ? req.file.path : null;
 
@@ -18,7 +18,7 @@ const create = async (req, res, next) => {
       nuevoArticulo.image = catchImg;
     } else {
       nuevoArticulo.image =
-        "https://res.cloudinary.com/dhkbe6djz/image/upload/v1689099748/UserFTProyect/tntqqfidpsmcmqdhuevb.png";
+        'https://res.cloudinary.com/dhkbe6djz/image/upload/v1689099748/UserFTProyect/tntqqfidpsmcmqdhuevb.png';
     }
 
     const guardarArticulo = await nuevoArticulo.save();
@@ -28,15 +28,16 @@ const create = async (req, res, next) => {
     } else {
       return res
         .status(404)
-        .json("No se ha podido guardar el elemento en la DB ❌");
+        .json('No se ha podido guardar el elemento en la DB ❌');
     }
   } catch (error) {
+    let catchImg = req.file ? req.file.path : null;
     if (catchImg) {
       deleteImgCloudinary(catchImg);
     }
 
     return res.status(404).json({
-      message: "Error en la creación del elemento",
+      message: 'Error en la creación del elemento',
       error: error,
     });
   }
@@ -44,17 +45,17 @@ const create = async (req, res, next) => {
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 //TODO CONTROLADOR PARA LEER TODO
-const getAll = async (rq, res, next) => {
+const getAll = async (rq, res) => {
   try {
     const TodosLosArticulos = await Articulo.find();
     if (TodosLosArticulos.length > 0) {
       return res.status(200).json(TodosLosArticulos);
     } else {
-      return res.status(404).json("No se han encontrado artículos");
+      return res.status(404).json('No se han encontrado artículos');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "error al buscar",
+      error: 'error al buscar',
       message: error.message,
     });
   }
@@ -63,14 +64,14 @@ const getAll = async (rq, res, next) => {
 
 //TODO CONTROLADOR PARA BUSCAR POR id
 
-const getByID = async (req, res, next) => {
+const getByID = async (req, res) => {
   try {
     const { id } = req.params;
     const articuloPorId = await Articulo.findById(id);
     if (articuloPorId) {
       return res.status(200).json(articuloPorId);
     } else {
-      return res.status(404).json("Artículo no encontrado");
+      return res.status(404).json('Artículo no encontrado');
     }
   } catch (error) {
     return res.status(404).json(error.message);
@@ -80,14 +81,14 @@ const getByID = async (req, res, next) => {
 
 //TODO CONTROLADOR PARA BUSCAR POR Categoria
 
-const getByCategoria = async (req, res, next) => {
+const getByCategoria = async (req, res) => {
   try {
     const { categoria } = req.params;
-    const articuloPorCate = await Articulo.find({categoria});
+    const articuloPorCate = await Articulo.find({ categoria });
     if (articuloPorCate) {
       return res.status(200).json(articuloPorCate);
     } else {
-      return res.status(404).json("No hay artículos en esta categoría");
+      return res.status(404).json('No hay artículos en esta categoría');
     }
   } catch (error) {
     return res.status(404).json(error.message);
@@ -98,18 +99,18 @@ const getByCategoria = async (req, res, next) => {
 
 //TODO CONTROLADOR PARA BUSCAR POR NOMBRE
 
-const getByName = async (req, res, next) => {
+const getByName = async (req, res) => {
   try {
     const { name } = req.params;
     const articuloPorNombre = await Articulo.find({ name });
     if (articuloPorNombre.length > 0) {
       return res.status(200).json(articuloPorNombre);
     } else {
-      return res.status(404).json("Articulo no encontrado");
+      return res.status(404).json('Articulo no encontrado');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "Error al buscar",
+      error: 'Error al buscar',
       message: error.message,
     });
   }
@@ -117,7 +118,7 @@ const getByName = async (req, res, next) => {
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 //todo CONTROLADOR DELETE
 
-const deleteArticulo = async (req, res, next) => {
+const deleteArticulo = async (req, res) => {
   try {
     const { id } = req.params;
     const article = await Articulo.findByIdAndDelete(id);
@@ -136,15 +137,13 @@ const deleteArticulo = async (req, res, next) => {
       return res.status(article ? 200 : 404).json({
         deleteTest: article ? true : false,
       });
-
     } catch (error) {
-      console.error("Error actualizando referencias:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+      console.error('Error actualizando referencias:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-
   } catch (error) {
-    console.error("Error eliminando artículo:", error);
-    return res.status(404).json({ error: "Artículo no encontrado" });
+    console.error('Error eliminando artículo:', error);
+    return res.status(404).json({ error: 'Artículo no encontrado' });
   }
 };
 
@@ -152,7 +151,7 @@ const deleteArticulo = async (req, res, next) => {
 
 //todo CONTROLADOR UPDATE
 
-const update = async (req, res, next) => {
+const update = async (req, res) => {
   await Articulo.syncIndexes();
   let catchImg = req.file?.path;
   try {
@@ -169,7 +168,9 @@ const update = async (req, res, next) => {
       };
       if (req.body?.categoria) {
         const resultEnum = enumOkCate(req.body?.categoria);
-        customBody.categoria = resultEnum.check ? req.body?.categoria : req.user.categoria;
+        customBody.categoria = resultEnum.check
+          ? req.body?.categoria
+          : req.user.categoria;
       }
 
       try {
@@ -197,7 +198,7 @@ const update = async (req, res, next) => {
             : (test = { ...test, file: false });
         }
         let acc = 0;
-        for (clave in test) {
+        for (let clave in test) {
           test[clave] == false && acc++;
         }
 
@@ -212,9 +213,11 @@ const update = async (req, res, next) => {
             update: true,
           });
         }
-      } catch (error) {}
+      } catch (error) {
+        return res.status(404).json('este Articulo no existe');
+      }
     } else {
-      return res.status(404).json("este Articulo no existe");
+      return res.status(404).json('este Articulo no existe');
     }
   } catch (error) {
     return res.status(404).json(error);
@@ -225,49 +228,47 @@ const update = async (req, res, next) => {
 
 //todo CONTROLADOR Ordenar de mayor a menor número de likes
 
-const ordenarLikes = async (req, res, next) => {
+const ordenarLikes = async (req, res) => {
   try {
     const TodosLosArticulos = await Articulo.find();
     if (TodosLosArticulos.length > 0) {
-    const resultados = TodosLosArticulos.map((articulo) => ({
-      name: articulo.name,
-      likesCount: articulo.likes.length,
-    }));
+      const resultados = TodosLosArticulos.map((articulo) => ({
+        name: articulo.name,
+        likesCount: articulo.likes.length,
+      }));
 
-    resultados.sort((a, b) => b.likesCount - a.likesCount);
+      resultados.sort((a, b) => b.likesCount - a.likesCount);
 
-   
       const primerElemento = resultados[0];
       return res.status(200).json(primerElemento);
     } else {
       return res.status(404).json({
-        error: "No se encontraron artículos",
+        error: 'No se encontraron artículos',
       });
     }
   } catch (error) {
     return res.status(500).json({
-      error: "Error al buscar",
+      error: 'Error al buscar',
       message: error.message,
     });
   }
 };
 //todo-------------------------------------------------------------------------------------------------------------------------------------------------
 
-const VerOferta=async(req,res,next)=>{
-try {
-  const todosLosArticulos=await Articulo.find()
-  const todosEnOferta=[]
-  todosLosArticulos.forEach((articulo)=>{
-if(articulo.oferta==true){
-  todosEnOferta.push(articulo)
-}
-  })
-  return res.status(200).json(todosEnOferta)
-} catch (error) {
-  return next(setError(500, error.message || "Error general"));
-}
-}
-
+const VerOferta = async (req, res, next) => {
+  try {
+    const todosLosArticulos = await Articulo.find();
+    const todosEnOferta = [];
+    todosLosArticulos.forEach((articulo) => {
+      if (articulo.oferta == true) {
+        todosEnOferta.push(articulo);
+      }
+    });
+    return res.status(200).json(todosEnOferta);
+  } catch (error) {
+    return next(setError(500, error.message || 'Error general'));
+  }
+};
 
 module.exports = {
   create,
@@ -276,6 +277,7 @@ module.exports = {
   getByName,
   deleteArticulo,
   update,
-  getByCategoria,ordenarLikes,
-  VerOferta
+  getByCategoria,
+  ordenarLikes,
+  VerOferta,
 };

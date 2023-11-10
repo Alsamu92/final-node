@@ -1,16 +1,14 @@
+let testEmailSend = false;
 
+const setSendEmail = (dataBoolean) => {
+  testEmailSend = dataBoolean;
+};
 
-let testEmailSend = false
+const getSendEmail = () => {
+  return testEmailSend;
+};
 
-const setSendEmail = (dataBoolean)=>{
-    testEmailSend =dataBoolean
-}
-
-const getSendEmail = ( )=>{
-    return testEmailSend
-}
-
-module.exports ={
-    getSendEmail,
-    setSendEmail
-}
+module.exports = {
+  getSendEmail,
+  setSendEmail,
+};

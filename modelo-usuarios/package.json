@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint ./src ./index.js",
+    "lint:fix": "eslint --fix ./src ./index.js ",
+    "format": "prettier --check --ignore-path .gitignore ./src  ./index.js ",
+    "format:fix": "prettier --write --ignore-path .gitignore ./src ./index.js   "
   },
   "keywords": [],
   "author": "",
@@ -22,7 +26,11 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "eslint": "^8.53.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
   },
   "description": ""
 }

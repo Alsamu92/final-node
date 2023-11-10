@@ -9,7 +9,14 @@ const enumOk = (gender) => {
   }
 };
 const enumOkCate = (categoria) => {
-  const enumcate = ["limpieza","alimentacion","juguetes","textil","electronica","drogueria"];
+  const enumcate = [
+    'limpieza',
+    'alimentacion',
+    'juguetes',
+    'textil',
+    'electronica',
+    'drogueria',
+  ];
   if (enumcate.includes(categoria)) {
     return { check: true, categoria };
   } else {
@@ -19,7 +26,7 @@ const enumOkCate = (categoria) => {
   }
 };
 const enumOkValora = (valoracion) => {
-  const enumValor = ["1","2","3","4","5"];
+  const enumValor = ['1', '2', '3', '4', '5'];
   if (enumValor.includes(valoracion)) {
     return { check: true, valoracion };
   } else {
@@ -29,4 +36,4 @@ const enumOkValora = (valoracion) => {
   }
 };
 
-module.exports ={enumOk,enumOkCate,enumOkValora}
+module.exports = { enumOk, enumOkCate, enumOkValora };

@@ -1,37 +1,36 @@
-const Articulo = require("../models/Articulo.model");
-const Supermercado = require("../models/Supermercado.model");
-const User = require("../models/User.model");
+const { deleteImgCloudinary } = require('../../middleware/files.middleware');
+const Articulo = require('../models/Articulo.model');
+const Supermercado = require('../models/Supermercado.model');
+const User = require('../models/User.model');
 
 //todo CONTROLADOR POST
 
 const crearSupermercado = async (req, res, next) => {
-  const admin=req.user?._id
-  if(admin){
+  const admin = req.user?._id;
+  if (admin) {
     try {
       await Supermercado.syncIndexes();
       const nuevoSupermercado = new Supermercado(req.body);
       const guardarSuper = await nuevoSupermercado.save();
       return res
         .status(guardarSuper ? 200 : 400)
-        .json(guardarSuper ? guardarSuper : "Error al crear el Supermercado");
+        .json(guardarSuper ? guardarSuper : 'Error al crear el Supermercado');
     } catch (error) {
       return (
         res.status(404).json({
-          error: "error en el catch",
+          error: 'error en el catch',
           message: error.message,
         }) && next(error)
       );
     }
-  }else{
-    return res.status(404).json("no Admin")
+  } else {
+    return res.status(404).json('no Admin');
   }
- 
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 //todo CONTROLADOR PATCH RELACIONAL
 
 const toggleArticulo = async (req, res, next) => {
-
   //recibimos por el param el id del supermercado al que añadiremos el articulo
   const { id } = req.params;
   //por el body pasamos el id de los articulos que queremos añadir
@@ -39,7 +38,7 @@ const toggleArticulo = async (req, res, next) => {
   const supermercadoByID = await Supermercado.findById(id);
 
   if (supermercadoByID) {
-    const arrayArticulos = articulos.split(",");
+    const arrayArticulos = articulos.split(',');
     Promise.all(
       arrayArticulos.map(async (articulo) => {
         if (supermercadoByID.articulos.includes(articulo)) {
@@ -53,13 +52,13 @@ const toggleArticulo = async (req, res, next) => {
               });
             } catch (error) {
               res.status(404).json({
-                error: "error al actualizar el articulo",
+                error: 'error al actualizar el articulo',
                 message: error.message,
               }) && next(error);
             }
           } catch (error) {
             res.status(404).json({
-              error: "error al actualizar el supermercado",
+              error: 'error al actualizar el supermercado',
               message: error.message,
             }) && next(error);
           }
@@ -74,13 +73,13 @@ const toggleArticulo = async (req, res, next) => {
               });
             } catch (error) {
               res.status(404).json({
-                error: "error al actualizar el articulo",
+                error: 'error al actualizar el articulo',
                 message: error.message,
               }) && next(error);
             }
           } catch (error) {
             res.status(404).json({
-              error: "error al actualizar el supermercado",
+              error: 'error al actualizar el supermercado',
               message: error.message,
             }) && next(error);
           }
@@ -98,7 +97,7 @@ const toggleArticulo = async (req, res, next) => {
 
 //todo CONTROLADOR BORRAR SUPER
 
-const borrarSuper = async (req, res, next) => {
+const borrarSuper = async (req, res) => {
   try {
     const { id } = req.params;
     const sup = await Supermercado.findByIdAndDelete(id);
@@ -117,48 +116,46 @@ const borrarSuper = async (req, res, next) => {
       return res.status(sup ? 200 : 404).json({
         deleteTest: sup ? true : false,
       });
-
     } catch (error) {
-      console.error("Error actualizando referencias:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+      console.error('Error actualizando referencias:', error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-
   } catch (error) {
-    console.error("Error eliminando artículo:", error);
-    return res.status(404).json({ error: "Artículo no encontrado" });
+    console.error('Error eliminando artículo:', error);
+    return res.status(404).json({ error: 'Artículo no encontrado' });
   }
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 //todo CONTROLADOR BUSCAR POR ID
 
-const BuscarSuper = async (req, res, next) => {
+const BuscarSuper = async (req, res) => {
   try {
     const { id } = req.params;
     const SuperPorId = await Supermercado.findById(id);
     if (SuperPorId) {
       return res.status(200).json(SuperPorId);
     } else {
-      return res.status(404).json("No se ha encontrado");
+      return res.status(404).json('No se ha encontrado');
     }
   } catch (error) {
-    return res.status(404).json("No encontrado");
+    return res.status(404).json('No encontrado');
   }
 };
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 //todo CONTROLADOR BUSCAR Todos
 
-const getAll = async (rq, res, next) => {
+const getAll = async (rq, res) => {
   try {
     const TodosLosSupers = await Supermercado.find();
     if (TodosLosSupers.length > 0) {
       return res.status(200).json(TodosLosSupers);
     } else {
-      return res.status(404).json("No se han encontrado artículos");
+      return res.status(404).json('No se han encontrado artículos');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "error al buscar",
+      error: 'error al buscar',
       message: error.message,
     });
   }
@@ -166,18 +163,18 @@ const getAll = async (rq, res, next) => {
 //todo-----------------------------------------------------------------------------------------------------------------------------------------
 
 //todo CONTROLADOR BUSCAR POR NOMBRE
-const buscarNameSuper = async (req, res, nex) => {
+const buscarNameSuper = async (req, res) => {
   try {
     const { name } = req.params;
     const nombreSuper = await Supermercado.find({ name });
     if (nombreSuper.length > 0) {
       return res.status(200).json(nombreSuper);
     } else {
-      return res.status(404).json("No se ha encontado este super");
+      return res.status(404).json('No se ha encontado este super');
     }
   } catch (error) {
     return res.status(404).json({
-      error: "No encontrado",
+      error: 'No encontrado',
       message: error.message,
     });
   }
@@ -186,7 +183,7 @@ const buscarNameSuper = async (req, res, nex) => {
 
 //todo CONTROLADOR UPDATE
 
-const update = async (req, res, next) => {
+const update = async (req, res) => {
   await Supermercado.syncIndexes();
   let catchImg = req.file?.path;
   try {
@@ -200,7 +197,9 @@ const update = async (req, res, next) => {
         image: req.file?.path ? catchImg : oldImg,
         name: req.body?.name ? req.body?.name : SuperById.name,
         price: req.body?.price ? req.body?.price : SuperById.price,
-        numeroLocales: req.body?.numeroLocales ? req.body?.numeroLocales : SuperById.numeroLocales,
+        numeroLocales: req.body?.numeroLocales
+          ? req.body?.numeroLocales
+          : SuperById.numeroLocales,
       };
 
       try {
@@ -228,7 +227,7 @@ const update = async (req, res, next) => {
             : (test = { ...test, file: false });
         }
         let acc = 0;
-        for (clave in test) {
+        for (let clave in test) {
           test[clave] == false && acc++;
         }
 
@@ -243,9 +242,11 @@ const update = async (req, res, next) => {
             update: true,
           });
         }
-      } catch (error) {}
+      } catch (error) {
+        return res.status(404).json('Error al buscar');
+      }
     } else {
-      return res.status(404).json("este Super no existe");
+      return res.status(404).json('este Super no existe');
     }
   } catch (error) {
     return res.status(404).json(error);
@@ -253,90 +254,83 @@ const update = async (req, res, next) => {
 };
 
 //todo CONTROLADOR BUSCAR POR Lugar
-const buscarPorLugarSuper = async (req, res, nex) => {
+const buscarPorLugarSuper = async (req, res) => {
   try {
-    const {_id} = req.user;
+    const { _id } = req.user;
     const todosSupers = await Supermercado.find();
-    
-  const usuarioBuscado= await User.findById(_id)
-  console.log("hola",_id)
-    const supersCoincidentes= []
-  
-      todosSupers.forEach((supermercado)=>{
-  
-if(supermercado.provincias.includes(usuarioBuscado.provincia)){
 
- supersCoincidentes.push(supermercado)
-}
+    const usuarioBuscado = await User.findById(_id);
+    console.log('hola', _id);
+    const supersCoincidentes = [];
 
-     })
-      if (supersCoincidentes.length > 0) {
-        return res.status(200).json( supersCoincidentes);
-      } else {
-        return res.status(404).json("No se ha encontrado supermercados en esta provincia");
+    todosSupers.forEach((supermercado) => {
+      if (supermercado.provincias.includes(usuarioBuscado.provincia)) {
+        supersCoincidentes.push(supermercado);
       }
-     
-     
-   
+    });
+    if (supersCoincidentes.length > 0) {
+      return res.status(200).json(supersCoincidentes);
+    } else {
+      return res
+        .status(404)
+        .json('No se ha encontrado supermercados en esta provincia');
+    }
   } catch (error) {
     return res.status(404).json({
-      error: "No encontrado",
+      error: 'No encontrado',
       message: error.message,
     });
   }
 };
 //todo------------------------------------------------------------------------------------------------------------------------------------
 //todo-----------------Ordenar por número de artículos-------------------------------------------------------------------------------------------------------------------
-const mostrarConMasArt = async (req, res, next) => {
+const mostrarConMasArt = async (req, res) => {
   try {
     const TodosLosSuper = await Supermercado.find();
     if (TodosLosSuper.length > 0) {
-    const resultados = TodosLosSuper.map((supermercado) => ({
-      name: supermercado.name,
-      artCount:supermercado.articulos.length,
-    }));
+      const resultados = TodosLosSuper.map((supermercado) => ({
+        name: supermercado.name,
+        artCount: supermercado.articulos.length,
+      }));
 
-    resultados.sort((a, b) => b.artCount - a.artCount);
+      resultados.sort((a, b) => b.artCount - a.artCount);
 
-   
       const primerElemento = resultados[0];
       return res.status(200).json(primerElemento);
     } else {
       return res.status(404).json({
-        error: "No se encontraron supermercados",
+        error: 'No se encontraron supermercados',
       });
     }
   } catch (error) {
     return res.status(500).json({
-      error: "Error al buscar",
+      error: 'Error al buscar',
       message: error.message,
     });
   }
 };
 //todo------------------------------------------------------------------------------------------------------------------------------------
 //todo-----------------Ordenar por número de locales-------------------------------------------------------------------------------------------------------------------
-const mostrarConMasLocales = async (req, res, next) => {
+const mostrarConMasLocales = async (req, res) => {
   try {
     const TodosLosSuper = await Supermercado.find();
     if (TodosLosSuper.length > 0) {
-    const resultados = TodosLosSuper.map((supermercado) => ({
-      name: supermercado.name,
-      locCount:supermercado.numeroLocales
-    }));
+      const resultados = TodosLosSuper.map((supermercado) => ({
+        name: supermercado.name,
+        locCount: supermercado.numeroLocales,
+      }));
 
-    resultados.sort((a, b) => b.locCount - a.locCount);
+      resultados.sort((a, b) => b.locCount - a.locCount);
 
-   
-    
       return res.status(200).json(resultados);
     } else {
       return res.status(404).json({
-        error: "No se encontraron supermercados",
+        error: 'No se encontraron supermercados',
       });
     }
   } catch (error) {
     return res.status(500).json({
-      error: "Error al buscar",
+      error: 'Error al buscar',
       message: error.message,
     });
   }
@@ -353,5 +347,4 @@ module.exports = {
   getAll,
   mostrarConMasArt,
   mostrarConMasLocales,
-
 };
