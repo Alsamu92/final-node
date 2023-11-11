@@ -128,18 +128,23 @@ const deleteArticulo = async (req, res) => {
         { articulos: id },
         { $pull: { articulos: id } }
       );
-      await User.updateMany(
-        { ArticuloFav: id },
-        { $pull: { ArticuloFav: id } }
-      );
-      console.log(test);
+      try {
+        await User.updateMany(
+          { ArticuloFav: id },
+          { $pull: { ArticuloFav: id } }
+        );
 
-      return res.status(article ? 200 : 404).json({
-        deleteTest: article ? true : false,
-      });
+        console.log(test);
+
+        return res.status(article ? 200 : 404).json({
+          deleteTest: article ? true : false,
+        });
+      } catch (error) {
+        return res.status(404).json('Error al actualizar');
+      }
     } catch (error) {
       console.error('Error actualizando referencias:', error);
-      return res.status(500).json({ error: 'Error interno del servidor' });
+      return res.status(404).json({ error: 'Error interno del servidor' });
     }
   } catch (error) {
     console.error('Error eliminando artículo:', error);
@@ -230,17 +235,11 @@ const update = async (req, res) => {
 
 const ordenarLikes = async (req, res) => {
   try {
-    const TodosLosArticulos = await Articulo.find();
+    const TodosLosArticulos = await Articulo.find().populate("likes");
     if (TodosLosArticulos.length > 0) {
-      const resultados = TodosLosArticulos.map((articulo) => ({
-        name: articulo.name,
-        likesCount: articulo.likes.length,
-      }));
+      TodosLosArticulos.sort((a, b) => b.likes - a.likes);
 
-      resultados.sort((a, b) => b.likesCount - a.likesCount);
-
-      const primerElemento = resultados[0];
-      return res.status(200).json(primerElemento);
+      return res.status(200).json(TodosLosArticulos);
     } else {
       return res.status(404).json({
         error: 'No se encontraron artículos',

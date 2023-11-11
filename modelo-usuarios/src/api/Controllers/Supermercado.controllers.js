@@ -107,18 +107,26 @@ const borrarSuper = async (req, res) => {
         { supermercados: id },
         { $pull: { supermercados: id } }
       );
-      await User.updateMany(
-        { SupermercadoFav: id },
-        { $pull: { SupermercadoFav: id } }
-      );
-      console.log(test);
+      try {
+        await User.updateMany(
+          { SupermercadoFav: id },
+          { $pull: { SupermercadoFav: id } }
+        );
 
-      return res.status(sup ? 200 : 404).json({
-        deleteTest: sup ? true : false,
-      });
+        console.log(test);
+
+        return res.status(sup ? 200 : 404).json({
+          deleteTest: sup ? true : false,
+        });
+      } catch (error) {
+        ({
+          error: 'error al actualizar el super',
+          message: error.message,
+        });
+      }
     } catch (error) {
       console.error('Error actualizando referencias:', error);
-      return res.status(500).json({ error: 'Error interno del servidor' });
+      return res.status(404).json({ error: 'Error al actualizar' });
     }
   } catch (error) {
     console.error('Error eliminando artículo:', error);
@@ -257,7 +265,7 @@ const update = async (req, res) => {
 const buscarPorLugarSuper = async (req, res) => {
   try {
     const { _id } = req.user;
-    const todosSupers = await Supermercado.find();
+    const todosSupers = await Supermercado.find().populate('articulos likes');
 
     const usuarioBuscado = await User.findById(_id);
     console.log('hola', _id);
@@ -286,17 +294,11 @@ const buscarPorLugarSuper = async (req, res) => {
 //todo-----------------Ordenar por número de artículos-------------------------------------------------------------------------------------------------------------------
 const mostrarConMasArt = async (req, res) => {
   try {
-    const TodosLosSuper = await Supermercado.find();
+    const TodosLosSuper = await Supermercado.find().populate('articulos likes');
     if (TodosLosSuper.length > 0) {
-      const resultados = TodosLosSuper.map((supermercado) => ({
-        name: supermercado.name,
-        artCount: supermercado.articulos.length,
-      }));
+      TodosLosSuper.sort((a, b) => b.articulos.length - a.articulos.length);
 
-      resultados.sort((a, b) => b.artCount - a.artCount);
-
-      const primerElemento = resultados[0];
-      return res.status(200).json(primerElemento);
+      return res.status(200).json(TodosLosSuper);
     } else {
       return res.status(404).json({
         error: 'No se encontraron supermercados',
@@ -315,14 +317,9 @@ const mostrarConMasLocales = async (req, res) => {
   try {
     const TodosLosSuper = await Supermercado.find();
     if (TodosLosSuper.length > 0) {
-      const resultados = TodosLosSuper.map((supermercado) => ({
-        name: supermercado.name,
-        locCount: supermercado.numeroLocales,
-      }));
+      TodosLosSuper.sort((a, b) => b.numeroLocales - a.numeroLocales);
 
-      resultados.sort((a, b) => b.locCount - a.locCount);
-
-      return res.status(200).json(resultados);
+      return res.status(200).json(TodosLosSuper);
     } else {
       return res.status(404).json({
         error: 'No se encontraron supermercados',

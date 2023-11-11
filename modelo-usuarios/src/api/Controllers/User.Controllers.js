@@ -10,10 +10,10 @@ const User = require('../models/User.model');
 const nodemailer = require('nodemailer');
 const validator = require('validator');
 const { enumOk } = require('../../utils/enumOk');
-const { deleteImgCloudinary } = require('../../middleware/files.middleware');
 const Supermercado = require('../models/Supermercado.model');
 const Articulo = require('../models/Articulo.model');
 const Comentario = require('../models/Comentarios.model');
+const { deleteImgCloudinary } = require('../../middleware/files.middleware');
 
 //todo-----------CONTROLADOR PARA SUBIR NUEVO USUARIO-------------------
 const subirUser = async (req, res, next) => {
@@ -496,42 +496,62 @@ const cambiarPass = async (req, res, next) => {
 const borrarUser = async (req, res) => {
   try {
     const { _id } = req.user;
-    console.log(req.user);
-
     // Eliminar el usuario por su ID
+    const userDelete = await User.findById(_id);
     await User.findByIdAndDelete(_id);
-
+    console.log(req.user.image);
     // Eliminar la imagen asociada al usuario en Cloudinary
-    deleteImgCloudinary(req.user?.image);
+    deleteImgCloudinary(userDelete.image);
+    try {
+      // Actualizar los documentos en la colección "User" eliminando el ID del usuario del array "followed"
+      await User.updateMany({ followed: _id }, { $pull: { followed: _id } });
+      try {
+        // Actualizar los documentos en las colecciones "Articulo" y "Supermercado" eliminando el ID del usuario del array "likes"
+        await Articulo.updateMany({ likes: _id }, { $pull: { likes: _id } });
+        try {
+          await Supermercado.updateMany(
+            { likes: _id },
+            { $pull: { likes: _id } }
+          );
 
-    // Actualizar los documentos en la colección "User" eliminando el ID del usuario del array "followed"
-    await User.updateMany({ followed: _id }, { $pull: { followed: _id } });
+          // Eliminar todos los comentarios hechos por el usuario
+          const comentarios = await Comentario.find({ publicadoPor: _id });
+          //Uso for of porque foreach me pide que haga asincrona la callback y prefiero asi.
+          for (const comentario of comentarios) {
+            await Comentario.findByIdAndDelete(comentario._id);
+            await Articulo.updateMany(
+              { comentarios: comentario._id },
+              { $pull: { comentarios: comentario._id } }
+            );
+          }
 
-    // Actualizar los documentos en las colecciones "Articulo" y "Supermercado" eliminando el ID del usuario del array "likes"
-    await Articulo.updateMany({ likes: _id }, { $pull: { likes: _id } });
+          const existUser = await User.findById(_id);
 
-    await Supermercado.updateMany({ likes: _id }, { $pull: { likes: _id } });
-
-    // Eliminar todos los comentarios hechos por el usuario
-    const comentarios = await Comentario.find({ publicadoPor: _id });
-    //Uso for of porque foreach me pide que haga asincrona la callback y prefiero asi.
-    for (const comentario of comentarios) {
-      await Comentario.findByIdAndDelete(comentario._id);
-      await Articulo.updateMany(
-        { comentarios: comentario._id },
-        { $pull: { comentarios: comentario._id } }
-      );
-    }
-
-    const existUser = await User.findById(_id);
-
-    if (existUser) {
+          if (existUser) {
+            return res.status(404).json({
+              deleteTest: false,
+            });
+          } else {
+            return res.status(200).json({
+              deleteTest: true,
+            });
+          }
+        } catch (error) {
+          return res.status(404).json({
+            message: 'Error al actualizar los supermercados',
+            error: error.message,
+          });
+        }
+      } catch (error) {
+        return res.status(404).json({
+          message: 'Error al actualizar los likes',
+          error: error.message,
+        });
+      }
+    } catch (error) {
       return res.status(404).json({
-        deleteTest: false,
-      });
-    } else {
-      return res.status(200).json({
-        deleteTest: true,
+        message: 'Error al actualizar los followed',
+        error: error.message,
       });
     }
   } catch (error) {

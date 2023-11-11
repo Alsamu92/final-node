@@ -110,7 +110,9 @@ const borrarComentario = async (req, res) => {
 //todo CONTROLADOR BUSCAR todos los comentarios
 const buscarValoracion = async (req, res) => {
   try {
-    const TodosLosComentarios = await Comentario.find();
+    const TodosLosComentarios = await Comentario.find().populate(
+      'articuloRef publicadoPor'
+    );
     if (TodosLosComentarios.length > 0) {
       return res.status(200).json(TodosLosComentarios);
     } else {
@@ -125,16 +127,16 @@ const buscarValoracion = async (req, res) => {
 };
 const ordenarPorValoracion = async (req, res) => {
   try {
-    const TodosLosComentarios = await Comentario.find();
+    const TodosLosComentarios = await Comentario.find().populate(
+      'publicadoPor articuloRef'
+    );
     if (TodosLosComentarios.length > 0) {
-      const resultados = TodosLosComentarios.map((comentario) => ({
-        articuloRef: comentario.articuloRef,
-        valCount: comentario.valoracion,
-      }));
+      TodosLosComentarios.sort(
+        (a, b) =>
+          b.TodosLosComentarios.valoracion - a.TodosLosComentarios.valoracion
+      );
 
-      resultados.sort((a, b) => b.valCountCount - a.valCount);
-
-      return res.status(200).json(resultados);
+      return res.status(200).json(TodosLosComentarios);
     } else {
       return res.status(404).json({
         error: 'No se encontraron comentarios',
